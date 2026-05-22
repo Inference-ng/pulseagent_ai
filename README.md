@@ -43,7 +43,7 @@ purseagent-ai/
 | **Emmanuel** (Elebiemayo Iseoluwa) | AI/ML Engineer | `apps/ai-agent/` |
 | **Nwokedi Ikechukwu** | Backend Engineer | `apps/backend/` + `infra/` |
 | **Victor Chukwuebuka** | Frontend Engineer | `apps/frontend/` |
-| **[Pitcher/Designer]** | Solution Paper, Pitch Deck, Security | `docs/` |
+| **David Aborowa** | Solution Paper, Pitch Deck, Security | `docs/` |
 
 ---
 
