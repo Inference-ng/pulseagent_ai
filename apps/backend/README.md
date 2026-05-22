@@ -1,203 +1,314 @@
-# ⚡ Backend API — Nwokedi's Domain
-> **Nwokedi Ikechukwu** | FastAPI Backend + Docker Infrastructure
+# 🚀 PurseAgent AI — Backend API
+
+**Version:** 1.0.0 | **Owner:** Nwokedi Ikechukwu | **Stack:** FastAPI + Prisma + Neon PostgreSQL
 
 ---
 
-## Your Mission
-You own the entire backend and deployment infrastructure. Every API call from the frontend goes through you. You also call Emmanuel's AI agent module internally. You make the system containerised and submittable.
+## 📋 Quick Links
+
+- **[Setup Guide](SETUP.md)** — Get running in 5 minutes
+- **[API Documentation](API_DOCUMENTATION.md)** — Endpoint specs, request/response formats
+- **[Architecture](ARCHITECTURE.md)** — System design, data flow, patterns
+- **[Swagger UI](http://127.0.0.1:8000/docs)** — Interactive API explorer (when running)
 
 ---
 
-## Your Deliverables
+## ⚡ What This Does
 
-1. **FastAPI application** with Task A and Task B endpoints
-2. **Docker + docker-compose** — one command launches the entire stack
-3. **Database** — SQLite (fast) or PostgreSQL for storing personas and results
-4. **Dataset download scripts** in `data/`
-5. **Clean API documentation** at `/docs` (Swagger auto-generated)
+FastAPI backend for **PurseAgent AI** (BCT Hackathon 2026) with two core endpoints:
+
+| Task | Endpoint | Purpose |
+|------|----------|---------|
+| **A** | `POST /api/v1/simulate-review` | Generate realistic user reviews for products |
+| **B** | `POST /api/v1/recommend` | Get personalized product recommendations |
+
+Both endpoints:
+- ✅ Call Emmanuel's AI agents internally
+- ✅ Have 60-second timeouts (prevent hanging)
+- ✅ Log results to database
+- ✅ Return structured JSON responses
+- ✅ Include full error handling
 
 ---
 
-## Directory Structure
+## 🏗️ Tech Stack
+
+| Layer | Technology | Version |
+|-------|------------|---------|
+| **Framework** | FastAPI | 0.111.0 |
+| **Server** | Uvicorn | 0.29.0 |
+| **ORM** | Prisma | 0.15.0 |
+| **Database** | Neon PostgreSQL | Latest |
+| **Validation** | Pydantic v2 | 2.7.0 |
+| **Testing** | pytest | 8.2.0 |
+| **Python** | CPython | 3.12.7 |
+
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Prerequisites
+- Python 3.12+
+- Neon PostgreSQL account (free at https://console.neon.tech)
+
+### 2️⃣ Clone & Setup
+```bash
+cd apps/backend
+
+# Create virtual environment
+python -m venv venv
+.\venv\Scripts\activate  # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 3️⃣ Configure Database
+Create `.env` file:
+```env
+DATABASE_URL=postgresql://user:password@host/database
+```
+
+### 4️⃣ Run Migrations
+```bash
+prisma migrate dev --name init
+```
+
+### 5️⃣ Start Server
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+### 6️⃣ Test
+Open **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)** in browser
+
+---
+
+## 📁 Directory Structure
 
 ```
 apps/backend/
 ├── app/
-│   ├── main.py                  # FastAPI app entry point
-│   ├── config.py                # Settings from .env
-│   ├── database.py              # DB connection + SQLAlchemy setup
+│   ├── main.py                    # ✅ FastAPI entry point
+│   ├── config.py                  # ✅ Settings & env vars
+│   ├── database.py                # ✅ Prisma client singleton
 │   ├── routers/
-│   │   ├── simulate.py          # POST /api/v1/simulate-review (Task A)
-│   │   ├── recommend.py         # POST /api/v1/recommend (Task B)
-│   │   └── health.py            # GET /health
+│   │   ├── health.py              # ✅ GET /health
+│   │   ├── simulate.py            # ✅ POST /api/v1/simulate-review
+│   │   └── recommend.py           # ✅ POST /api/v1/recommend
+│   ├── services/
+│   │   ├── agent_service.py       # ✅ AI agent bridge
+│   │   └── db_service.py          # ✅ Database operations
 │   ├── schemas/
-│   │   ├── request.py           # Pydantic request models
-│   │   └── response.py          # Pydantic response models
-│   ├── models/
-│   │   └── user_profile.py      # SQLAlchemy DB model
-│   └── services/
-│       ├── agent_service.py     # Calls Emmanuel's AI agent
-│       └── cache_service.py     # Simple in-memory cache
+│   │   ├── request.py             # ✅ Request validation (Pydantic)
+│   │   └── response.py            # ✅ Response models
+│   └── utils/
+│       └── constants.py           # ✅ App constants
+├── prisma/
+│   ├── schema.prisma              # ✅ Database schema (4 tables)
+│   └── migrations/                # ✅ Migration history
 ├── tests/
-│   ├── test_simulate.py
-│   └── test_recommend.py
-├── Dockerfile
-├── requirements.txt
-└── README.md
+│   └── README.md                  # Tests ready after Phase 7
+├── .env                           # ⚠️  NOT in git
+├── .env.example                   # ✅ Template for .env
+├── requirements.txt               # ✅ All dependencies
+├── Dockerfile                     # ✅ Container spec
+├── SETUP.md                       # ✅ Setup instructions
+├── API_DOCUMENTATION.md           # ✅ API endpoints & models
+├── ARCHITECTURE.md                # ✅ System design
+└── README.md                      # ✅ This file
 ```
 
 ---
 
-## Tech Stack
-| Tool | Purpose |
-|---|---|
-| **FastAPI** | REST API framework |
-| **SQLAlchemy** | ORM |
-| **SQLite / PostgreSQL** | Database |
-| **Pydantic v2** | Request/response validation |
-| **Uvicorn** | ASGI server |
-| **httpx** | Async HTTP client (for testing) |
-| **pytest** | Testing |
+## 🔌 API Endpoints
 
----
-
-## API Endpoints to Build
-
-### `POST /api/v1/simulate-review` (Task A)
-```python
-# Request body
-{
-  "user_persona": {
-    "user_id": "string",
-    "purchase_history": ["item1", "item2"],
-    "avg_rating_given": 3.8,
-    "price_sensitivity": "high|medium|low",
-    "preferred_categories": ["footwear"]
-  },
-  "product": {
-    "name": "string",
-    "category": "string",
-    "price": 45000,
-    "brand": "string",
-    "description": "string"
-  }
-}
-# Response
-{
-  "predicted_rating": 3.5,
-  "simulated_review": "Honestly, e good o but...",
-  "confidence": 0.82,
-  "reasoning": "User is price-sensitive..."
-}
-```
-
-### `POST /api/v1/recommend` (Task B)
-```python
-# Request body
-{
-  "user_persona": {
-    "user_id": "string",
-    "is_cold_start": false,
-    "purchase_history": [],
-    "context": "looking for evening shoes for owambe"
-  },
-  "top_k": 10,
-  "domain": "fashion|electronics|books|food"
-}
-# Response
-{
-  "recommendations": [
-    {
-      "item_id": "string",
-      "item_name": "string",
-      "category": "string",
-      "score": 0.95,
-      "reason": "Based on your preference for..."
-    }
-  ],
-  "is_cold_start": false,
-  "total": 10
-}
-```
-
-### `GET /health`
-```json
-{ "status": "ok", "version": "1.0.0" }
-```
-
----
-
-## `app/main.py` Skeleton
-
-```python
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.routers import simulate, recommend, health
-from app.config import settings
-
-app = FastAPI(
-    title="PurseAgent AI",
-    description="Next-Best-Action Customer Intelligence Agent",
-    version="1.0.0"
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(health.router)
-app.include_router(simulate.router, prefix="/api/v1")
-app.include_router(recommend.router, prefix="/api/v1")
-```
-
----
-
-## Dockerfile
-
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-```
-
----
-
-## `requirements.txt`
-
-```
-fastapi==0.111.0
-uvicorn[standard]==0.29.0
-pydantic==2.7.0
-pydantic-settings==2.2.0
-sqlalchemy==2.0.30
-aiosqlite==0.20.0
-python-dotenv==1.0.0
-httpx==0.27.0
-pytest==8.2.0
-pytest-asyncio==0.23.0
-```
-
----
-
-## Setup (Local Dev)
-
+### Health Check
 ```bash
-cd apps/backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+GET /health
+```
+Returns database & server status. Use to monitor health.
 
-# Create .env from root .env.example
-cp ../../.env.example .env
+### Task A: Simulate Review
+```bash
+POST /api/v1/simulate-review
+```
+Input: User persona + product  
+Output: Predicted rating (1-5), simulated review text, confidence score
+
+### Task B: Get Recommendations
+```bash
+POST /api/v1/recommend
+```
+Input: User persona + top_k + domain (fashion/electronics/books/food)  
+Output: Ranked list of products with scores & reasoning
+
+**Full specs:** See [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
+
+---
+
+## 📊 Database Schema
+
+4 PostgreSQL tables (auto-created by Prisma):
+
+| Table | Purpose |
+|-------|---------|
+| **User** | Store user personas |
+| **Simulation** | Log Task A results (ratings, reviews) |
+| **Recommendation** | Log Task B results (recommendations) |
+| **AuditLog** | Track all API calls for monitoring |
+
+**Schema details:** See [ARCHITECTURE.md](ARCHITECTURE.md#database-schema)
+
+---
+
+## 🧪 Testing (Phase 7 — When Agents Ready)
+
+### Run Unit Tests
+```bash
+pytest tests/
+```
+
+### Manual Testing
+1. Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+2. Click endpoint
+3. Click "Try it out"
+4. Modify request body
+5. Click "Execute"
+
+### Test with cURL
+```bash
+# Health check
+curl http://127.0.0.1:8000/health
+
+# Simulate review
+curl -X POST http://127.0.0.1:8000/api/v1/simulate-review \
+  -H "Content-Type: application/json" \
+  -d '{"user_persona": {"user_id": "u1"}, "product": {"product_id": "p1"}}'
+```
+
+---
+
+## 🐳 Docker
+
+### Build Container
+```bash
+docker build -t purseagent-backend .
+```
+
+### Run Container
+```bash
+docker run -e DATABASE_URL="postgresql://..." -p 8000:8000 purseagent-backend
+```
+
+### Docker Compose (from root)
+```bash
+docker-compose up
+```
+
+---
+
+## 📝 Development
+
+### Making Changes
+1. Edit files in `app/`
+2. Server auto-reloads (thanks to `--reload`)
+3. Check errors in terminal
+
+### Database Changes
+```bash
+# Edit prisma/schema.prisma
+# Then run:
+prisma migrate dev --name your_change_name
+```
+
+### View Database
+```bash
+prisma studio
+# Opens GUI at http://localhost:5555
+```
+
+---
+
+## 🚨 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "No module named fastapi" | Activate venv: `.\venv\Scripts\activate` |
+| "Connection refused" to DB | Check DATABASE_URL in .env |
+| "relation 'User' does not exist" | Run migrations: `prisma migrate dev` |
+| Port 8000 in use | Use different port: `--port 8001` |
+
+**More help:** See [SETUP.md](SETUP.md#troubleshooting)
+
+---
+
+## 📦 Dependencies
+
+**Core:**
+- `fastapi` — Web framework
+- `uvicorn` — ASGI server
+- `prisma` — Database ORM
+
+**Validation:**
+- `pydantic` — Request/response validation
+
+**Database:**
+- `neon` — Serverless PostgreSQL
+
+**Testing:**
+- `pytest` — Test framework (Phase 7)
+
+**All versions:** See [requirements.txt](requirements.txt)
+
+---
+
+## 📖 Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [SETUP.md](SETUP.md) | Step-by-step setup guide |
+| [API_DOCUMENTATION.md](API_DOCUMENTATION.md) | Endpoint specs & examples |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System design & patterns |
+| Swagger UI | Interactive API explorer at `/docs` |
+
+---
+
+## 🎯 Implementation Status
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Phase 0 | ✅ Complete | Neon DB, venv, .env configured |
+| Phase 1 | ✅ Complete | File structure created (25+ files) |
+| Phase 2 | ✅ Complete | Prisma schema migrated to Neon |
+| Phase 3 | ✅ Complete | FastAPI running, endpoints responding |
+| Phase 4 | ✅ Complete | Pydantic schemas validated |
+| Phase 5 | ✅ Complete | Agent service bridge ready |
+| Phase 6 | ✅ Complete | All 3 endpoints fully implemented |
+| Phase 7 | ⏳ Waiting | Unit tests (need agents ready first) |
+| Phase 8 | ✅ Done | Docker build works |
+| Phase 9 | ✅ Complete | Comprehensive documentation |
+
+---
+
+## 🔮 Next Steps
+
+1. **Verify Agents:** Emmanuel finalizes AI agents
+2. **Integrate Agents:** Connect agents to agent_service.py
+3. **Run Tests:** Execute Phase 7 test suite
+4. **Deploy:** Push to production (Fly.io, Railway, etc)
+
+---
+
+## 👤 Contact
+
+**Backend Owner:** Nwokedi Ikechukwu  
+**AI Agents Owner:** Emmanuel/Iseoluwa  
+**Hackathon:** BCT Hackathon 2026
+
+---
+
+**Ready to test?** See [SETUP.md](SETUP.md) to get started! 🚀
 
 # Run the API
 uvicorn app.main:app --reload --port 8000

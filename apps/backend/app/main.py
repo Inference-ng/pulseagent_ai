@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import connect_db, disconnect_db
+from app.routers import health, simulate, recommend
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -39,6 +40,12 @@ async def shutdown_event():
     print(f"🛑 {settings.app_name} shut down")
 
 
+# Include routers
+app.include_router(health.router)
+app.include_router(simulate.router)
+app.include_router(recommend.router)
+
+
 # Root endpoint
 @app.get("/", tags=["root"])
 async def root():
@@ -47,17 +54,6 @@ async def root():
         "message": f"{settings.app_name} is running",
         "version": settings.app_version,
         "environment": settings.environment,
-    }
-
-
-# Health check (will be moved to routers in Phase 3)
-@app.get("/health", tags=["health"])
-async def health():
-    """Health check endpoint"""
-    return {
-        "status": "ok",
-        "version": settings.app_version,
-        "tasks": ["A", "B"],
     }
 
 
