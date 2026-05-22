@@ -1,0 +1,11 @@
+langchain
+langgraph
+langchain-community
+langchain-google-genai
+faiss-cpu
+sentence-transformers
+pydantic>=2.0
+datasets
+pandas
+python-dotenv
+pytest
