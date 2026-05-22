@@ -1,5 +1,5 @@
 # 📄 Docs & Pitch — 4th Team Member's Domain
-> **[Your Name]** | Solution Paper · Pitch Deck · Security · Submission
+> **[DAVID ABOROWA]** | Solution Paper · Pitch Deck · Security · Submission
 
 ---
 

@@ -4,9 +4,9 @@ Welcome to the **PurseAgent AI** project. Instead of searching through every fol
 
 ---
 
-### 🧠 AI Agent — Emmanuel's Domain
-> **Elebiemayo Iseoluwa Emmanuel** | LangChain/LangGraph Agent Core
-**Working Directory:** `apps/ai-agent/`
+### 🧠 AI Agent & Data — Emmanuel's Domain
+> **Elebiemayo Iseoluwa Emmanuel** | LangChain/LangGraph Agent Core & Data Processing
+**Working Directory:** `apps/ai-agent/` and `data/`
 
 **Tasks:**
 - [ ] Read the setup instructions in `apps/ai-agent/README.md`
