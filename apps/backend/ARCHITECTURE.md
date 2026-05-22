@@ -156,6 +156,7 @@ apps/backend/
 ## Key Design Patterns
 
 ### 1. Layered Architecture
+
 - **Routers** → Handle HTTP requests, error handling
 - **Services** → Business logic, agent coordination
 - **Schemas** → Request/response validation
@@ -164,6 +165,7 @@ apps/backend/
 **Benefit:** Clean separation of concerns, easy to test
 
 ### 2. Background Tasks
+
 - Logging is non-blocking
 - `BackgroundTasks.add_task()` runs after response
 - Response returns immediately (user doesn't wait)
@@ -177,6 +179,7 @@ background_tasks.add_task(log_simulation, ...)
 ```
 
 ### 3. Timeout Handling
+
 - All agent calls wrap in `asyncio.wait_for(timeout=60)`
 - Prevents hanging requests
 - Returns 504 if agent exceeds timeout
@@ -192,6 +195,7 @@ except asyncio.TimeoutError:
 ```
 
 ### 4. Request Validation
+
 - Pydantic v2 automatically validates all inputs
 - Schema docstrings generate OpenAPI schema
 - Invalid requests return 422 with error details
@@ -203,6 +207,7 @@ async def simulate_review(req: SimulateReviewRequest):
 ```
 
 ### 5. Database Connection Pooling
+
 - Single Prisma client instance
 - Connection pool managed automatically
 - Graceful shutdown on app close
@@ -222,18 +227,22 @@ async def shutdown_event():
 ## Error Handling Strategy
 
 ### 1. Input Validation (400s)
+
 - **422:** Invalid request format/domain
 - **Handled by:** Pydantic schemas
 
 ### 2. Server Errors (500s)
+
 - **500:** Unexpected error during processing
 - **Handled by:** Try/except blocks in routers
 
 ### 3. Timeout Errors (504)
+
 - **504:** Agent exceeded 60-second timeout
 - **Handled by:** asyncio.wait_for()
 
 ### 4. Service Errors (503)
+
 - **503:** Database unavailable
 - **Handled by:** Health check endpoint
 
@@ -242,11 +251,13 @@ async def shutdown_event():
 ## Performance Considerations
 
 ### 1. Async/Await
+
 - All I/O operations are async
 - Allows handling multiple requests concurrently
 - Uvicorn manages worker pool
 
 ### 2. Database Indexing
+
 ```sql
 -- Simulate table
 CREATE INDEX ON "Simulation"(user_id);
@@ -256,11 +267,13 @@ CREATE INDEX ON "Recommendation"(user_id, domain);
 ```
 
 ### 3. Connection Pooling
+
 - Prisma uses connection pooling
 - Neon handles connection management
 - Max 10 concurrent connections (dev)
 
 ### 4. Response Caching (Future)
+
 - Could cache recommendations by (user_id, domain)
 - Cold-start detection prevents stale data
 - TTL: 24 hours
@@ -270,11 +283,13 @@ CREATE INDEX ON "Recommendation"(user_id, domain);
 ## Security Considerations
 
 ### Currently Implemented
+
 - ✅ CORS enabled (configurable origins)
 - ✅ Request validation (Pydantic)
 - ✅ Database connection via TLS
 
 ### To Implement (Production)
+
 - [ ] API key authentication
 - [ ] JWT token validation
 - [ ] Rate limiting per user
@@ -288,18 +303,22 @@ CREATE INDEX ON "Recommendation"(user_id, domain);
 ## Monitoring & Logging
 
 ### Audit Log Table
+
 Tracks every API call:
+
 ```
 endpoint      | method | status_code | duration_ms | error_msg | created_at
 /api/v1/...   | POST   | 200         | 1234        | null      | 2026-05-22
 ```
 
 ### Application Logs
+
 - Server startup/shutdown messages
 - Database connection status
 - Error tracebacks (in development)
 
 ### Metrics (Future)
+
 - [ ] Request latency histogram
 - [ ] Agent timeout frequency
 - [ ] Database query performance
@@ -310,17 +329,20 @@ endpoint      | method | status_code | duration_ms | error_msg | created_at
 ## Testing Strategy
 
 ### Unit Tests (Phase 7)
+
 - Mock AI agents
 - Test request validation
 - Test error handling
 - Test response schemas
 
 ### Integration Tests (Phase 8)
+
 - Real agents + real database
 - End-to-end request/response
 - Performance benchmarks
 
 ### Load Testing (Future)
+
 - Simulate concurrent users
 - Measure agent timeout behavior
 - Database pool exhaustion
@@ -330,17 +352,20 @@ endpoint      | method | status_code | duration_ms | error_msg | created_at
 ## Deployment Options
 
 ### Option 1: Docker Container (Recommended for Hackathon)
+
 ```bash
 docker build -t purseagent-backend .
 docker run -e DATABASE_URL=... -p 8000:8000 purseagent-backend
 ```
 
 ### Option 2: Fly.io / Render / Railway
+
 - Git push deployment
 - Automatic scaling
 - Built-in PostgreSQL
 
 ### Option 3: AWS Lambda
+
 - Serverless option
 - Auto-scaling
 - Lower cost for variable load
@@ -350,18 +375,22 @@ docker run -e DATABASE_URL=... -p 8000:8000 purseagent-backend
 ## Dependencies
 
 ### Core
+
 - **FastAPI 0.111.0** — Web framework
 - **Uvicorn 0.29.0** — ASGI server
 - **Prisma 0.15.0** — ORM
 
 ### Data Validation
+
 - **Pydantic 2.7.0** — Request/response validation
 
 ### Database
+
 - **Neon PostgreSQL** — Serverless database
 - **psycopg** — PostgreSQL adapter (via Prisma)
 
 ### Testing (Future)
+
 - **pytest** — Test framework
 - **pytest-asyncio** — Async test support
 - **httpx** — HTTP client for testing

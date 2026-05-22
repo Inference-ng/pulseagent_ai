@@ -7,11 +7,13 @@
 ## Prerequisites
 
 ### System Requirements
+
 - **Python:** 3.12+ (check with `python --version`)
 - **Node.js:** 18+ (for development tools, optional)
 - **Git:** Latest version
 
 ### Accounts Required
+
 - **Neon PostgreSQL:** Free account at https://console.neon.tech
   - Get your connection string: `postgresql://user:password@host/database`
 
@@ -101,12 +103,14 @@ prisma migrate dev --name init
 ```
 
 **Expected output:**
+
 ```
 ✔ Database created
 ✔ Migration applied successfully
 ```
 
 **What this does:**
+
 - Creates 4 tables: User, Simulation, Recommendation, AuditLog
 - Creates indexes for performance
 - Generates Prisma Python client
@@ -121,6 +125,7 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 **Expected output:**
+
 ```
 INFO:     Uvicorn running on http://127.0.0.1:8000
 INFO:     Press CTRL+C to quit
@@ -132,9 +137,11 @@ INFO:     Application startup complete
 ## Step 8: Verify It Works
 
 ### Option A: Open Browser
+
 ```
 http://127.0.0.1:8000/docs
 ```
+
 You should see the interactive Swagger UI with all endpoints.
 
 ### Option B: Test via Terminal
@@ -161,6 +168,7 @@ curl http://127.0.0.1:8000/health
 ### Issue: "ModuleNotFoundError: No module named 'fastapi'"
 
 **Solution:** Make sure venv is activated
+
 ```bash
 .\venv\Scripts\activate  # Windows
 source venv/bin/activate  # macOS/Linux
@@ -169,6 +177,7 @@ source venv/bin/activate  # macOS/Linux
 ### Issue: "UnicodeEncodeError" on Windows
 
 **Solution:** Already fixed. Just run migrations fresh:
+
 ```bash
 prisma migrate reset
 ```
@@ -176,11 +185,13 @@ prisma migrate reset
 ### Issue: "Connection refused" to database
 
 **Reasons:**
+
 1. Wrong connection string in `.env`
 2. Neon project is sleeping (restart it)
 3. Network/firewall issue
 
 **Solution:**
+
 ```bash
 # Verify connection string is correct
 cat .env
@@ -192,6 +203,7 @@ python -c "import asyncio; from app.database import connect_db; asyncio.run(conn
 ### Issue: "relation 'User' does not exist"
 
 **Solution:** Migrations didn't run. Try:
+
 ```bash
 prisma migrate dev --name init
 ```
@@ -199,6 +211,7 @@ prisma migrate dev --name init
 ### Issue: Port 8000 already in use
 
 **Solution:** Use different port
+
 ```bash
 uvicorn app.main:app --reload --port 8001
 ```
@@ -208,17 +221,20 @@ uvicorn app.main:app --reload --port 8001
 ## Development Workflow
 
 ### Running the Server
+
 ```bash
 # In venv
 uvicorn app.main:app --reload --port 8000
 ```
 
 ### Making Changes
+
 - Modify files in `app/`
 - Server auto-reloads (thanks to `--reload`)
 - Test in Swagger UI: http://127.0.0.1:8000/docs
 
 ### Database Schema Changes
+
 ```bash
 # Edit prisma/schema.prisma
 # Then run:
@@ -226,6 +242,7 @@ prisma migrate dev --name description_of_change
 ```
 
 ### Viewing Data
+
 ```bash
 # Open Prisma Studio (GUI for database)
 prisma studio
@@ -236,6 +253,7 @@ prisma studio
 ## Testing Endpoints Manually
 
 ### Using Swagger UI (Easiest)
+
 1. Go to http://127.0.0.1:8000/docs
 2. Click on an endpoint
 3. Click "Try it out"
@@ -245,11 +263,13 @@ prisma studio
 ### Using cURL
 
 **Health Check:**
+
 ```bash
 curl http://127.0.0.1:8000/health
 ```
 
 **Simulate Review (Task A):**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/simulate-review \
   -H "Content-Type: application/json" \
@@ -269,6 +289,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/simulate-review \
 ```
 
 **Get Recommendations (Task B):**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/recommend \
   -H "Content-Type: application/json" \
@@ -287,11 +308,13 @@ curl -X POST http://127.0.0.1:8000/api/v1/recommend \
 ## Docker Setup (Optional)
 
 ### Build Container
+
 ```bash
 docker build -t purseagent-backend .
 ```
 
 ### Run Container
+
 ```bash
 docker run \
   -e DATABASE_URL="postgresql://..." \
@@ -368,12 +391,14 @@ flake8 app/
 ## Getting Help
 
 ### Check Logs
+
 ```bash
 # Terminal where server is running shows real-time logs
 # Look for ERROR or WARNING lines
 ```
 
 ### View Database
+
 ```bash
 # Open Prisma Studio
 prisma studio
@@ -381,6 +406,7 @@ prisma studio
 ```
 
 ### Check Configuration
+
 ```bash
 # Verify all settings loaded correctly
 cat .env
@@ -388,6 +414,7 @@ echo $DATABASE_URL
 ```
 
 ### Verify Python Version
+
 ```bash
 python --version  # Should be 3.12+
 ```
@@ -397,6 +424,7 @@ python --version  # Should be 3.12+
 ## Production Checklist
 
 Before deploying:
+
 - [ ] Database: Neon project created & backed up
 - [ ] Secrets: `.env` file NOT in git
 - [ ] Tests: All passing (Phase 7)

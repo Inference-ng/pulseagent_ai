@@ -26,6 +26,7 @@ The PurseAgent AI backend provides two core APIs for the BCT Hackathon 2026:
 - **Task B (Recommend):** Provide personalized product recommendations based on user profile
 
 ### Key Features
+
 - ✅ Production-grade FastAPI application
 - ✅ Serverless PostgreSQL (Neon) for scalability
 - ✅ Type-safe ORM (Prisma) with auto-migrations
@@ -40,6 +41,7 @@ The PurseAgent AI backend provides two core APIs for the BCT Hackathon 2026:
 ## Quick Start
 
 ### Prerequisites
+
 - Python 3.12+
 - Virtual environment (venv)
 - Neon PostgreSQL account + connection string
@@ -69,6 +71,7 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 ### Verify Setup
+
 ```bash
 curl http://127.0.0.1:8000/health
 # Expected: {"status": "ok", "version": "1.0.0", ...}
@@ -85,6 +88,7 @@ curl http://127.0.0.1:8000/health
 Returns server and database status.
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "ok",
@@ -97,6 +101,7 @@ Returns server and database status.
 ```
 
 **Response (503 Service Unavailable):**
+
 ```json
 {
   "detail": "Database connection failed"
@@ -112,6 +117,7 @@ Returns server and database status.
 Generate a realistic review and rating for a product based on a user persona.
 
 **Request Body:**
+
 ```json
 {
   "user_persona": {
@@ -134,6 +140,7 @@ Generate a realistic review and rating for a product based on a user persona.
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "predicted_rating": 4.5,
@@ -144,6 +151,7 @@ Generate a realistic review and rating for a product based on a user persona.
 ```
 
 **Response (504 Gateway Timeout):**
+
 ```json
 {
   "detail": "Agent took too long to respond (timeout)"
@@ -151,6 +159,7 @@ Generate a realistic review and rating for a product based on a user persona.
 ```
 
 **Response (500 Internal Server Error):**
+
 ```json
 {
   "detail": "Agent error: <error message>"
@@ -166,6 +175,7 @@ Generate a realistic review and rating for a product based on a user persona.
 Get personalized product recommendations for a user.
 
 **Request Body:**
+
 ```json
 {
   "user_persona": {
@@ -181,12 +191,14 @@ Get personalized product recommendations for a user.
 ```
 
 **Valid Domains:**
+
 - `fashion` — Apparel, accessories, footwear
 - `electronics` — Gadgets, tech devices
 - `books` — Physical and digital books
 - `food` — Grocery, specialty foods
 
 **Response (200 OK):**
+
 ```json
 {
   "recommendations": [
@@ -213,6 +225,7 @@ Get personalized product recommendations for a user.
 ```
 
 **Response (422 Unprocessable Entity):**
+
 ```json
 {
   "detail": "Domain must be one of: fashion, electronics, books, food"
@@ -220,6 +233,7 @@ Get personalized product recommendations for a user.
 ```
 
 **Response (504 Gateway Timeout):**
+
 ```json
 {
   "detail": "Agent took too long to respond (timeout)"
@@ -297,13 +311,13 @@ Get personalized product recommendations for a user.
 
 ### HTTP Status Codes
 
-| Code | Meaning | Example |
-|------|---------|---------|
-| 200 | Success | Both endpoints return data |
-| 422 | Validation Error | Invalid domain in `/recommend` |
-| 500 | Server Error | Agent runtime error |
-| 503 | Service Unavailable | Database connection failed |
-| 504 | Gateway Timeout | Agent execution exceeded 60s |
+| Code | Meaning             | Example                        |
+| ---- | ------------------- | ------------------------------ |
+| 200  | Success             | Both endpoints return data     |
+| 422  | Validation Error    | Invalid domain in `/recommend` |
+| 500  | Server Error        | Agent runtime error            |
+| 503  | Service Unavailable | Database connection failed     |
+| 504  | Gateway Timeout     | Agent execution exceeded 60s   |
 
 ### Error Response Format
 
@@ -326,6 +340,7 @@ All errors follow this format:
 ## Database Schema
 
 ### User Table
+
 ```sql
 CREATE TABLE "User" (
   id              String    @id @default(cuid())
@@ -337,6 +352,7 @@ CREATE TABLE "User" (
 ```
 
 ### Simulation Table
+
 ```sql
 CREATE TABLE "Simulation" (
   id              String    @id @default(cuid())
@@ -345,12 +361,13 @@ CREATE TABLE "Simulation" (
   result          Json      -- Generated review + rating
   confidence      Float
   created_at      DateTime  @default(now())
-  
+
   @@index([user_id])
 }
 ```
 
 ### Recommendation Table
+
 ```sql
 CREATE TABLE "Recommendation" (
   id              String    @id @default(cuid())
@@ -359,12 +376,13 @@ CREATE TABLE "Recommendation" (
   domain          String    -- Category (fashion, etc)
   is_cold_start   Boolean
   created_at      DateTime  @default(now())
-  
+
   @@index([user_id, domain])
 }
 ```
 
 ### AuditLog Table
+
 ```sql
 CREATE TABLE "AuditLog" (
   id              String    @id @default(cuid())
@@ -396,6 +414,7 @@ CREATE TABLE "AuditLog" (
 ### Local Testing
 
 Use Swagger UI to test endpoints interactively:
+
 ```
 http://127.0.0.1:8000/docs
 ```
@@ -403,11 +422,13 @@ http://127.0.0.1:8000/docs
 ### Example cURL Commands
 
 **Test Health:**
+
 ```bash
 curl http://127.0.0.1:8000/health
 ```
 
 **Test Simulate Review:**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/simulate-review \
   -H "Content-Type: application/json" \
@@ -418,6 +439,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/simulate-review \
 ```
 
 **Test Recommend:**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/recommend \
   -H "Content-Type: application/json" \
@@ -433,6 +455,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/recommend \
 ## Support & Questions
 
 For issues or questions:
+
 1. Check error logs in terminal
 2. Review audit logs in database: `SELECT * FROM "AuditLog" ORDER BY created_at DESC`
 3. Check `/docs` Swagger UI for request validation errors
