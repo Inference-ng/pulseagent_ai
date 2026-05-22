@@ -3,10 +3,7 @@
 > **Next-Best-Action Customer Intelligence Agent**  
 > A dual-task LLM system for user modeling and personalized recommendation — built for the Bluechip Tech Hackathon 2026.
 
-[![Deadline](https://img.shields.io/badge/Deadline-24%20May%202026-red)](.)
-[![Tasks](https://img.shields.io/badge/Tasks-A%20%26%20B-blue)](.)
-[![Stack](https://img.shields.io/badge/Stack-FastAPI%20%7C%20React%20%7C%20LangChain-green)](.)
-[![Docker](https://img.shields.io/badge/Deploy-Docker%20Compose-blue)](.)
+
 
 ---
 
@@ -44,7 +41,7 @@ purseagent-ai/
 | Member | Role | Domain |
 |---|---|---|
 | **Emmanuel** (Elebiemayo Iseoluwa) | AI/ML Engineer | `apps/ai-agent/` |
-| **Nwokedi Ikechukwu** | Backend & DevOps | `apps/backend/` + `infra/` |
+| **Nwokedi Ikechukwu** | Backend Engineer | `apps/backend/` + `infra/` |
 | **Victor Chukwuebuka** | Frontend Engineer | `apps/frontend/` |
 | **[Pitcher/Designer]** | Solution Paper, Pitch Deck, Security | `docs/` |
 
