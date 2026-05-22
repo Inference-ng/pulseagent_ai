@@ -1,0 +1,2 @@
+# Processed datasets and FAISS indexes — gitignored (too large)
+# Run data/embed.py to populate this folder after downloading raw data

@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+
+  # ── AI Agent Service (Emmanuel) ──────────────────────────────
+  ai-agent:
+    build:
+      context: ./apps/ai-agent
+      dockerfile: Dockerfile
+    container_name: purseagent-ai-agent
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+    volumes:
+      - ./data:/app/data          # Shared dataset volume
+    networks:
+      - purseagent-net
+    restart: unless-stopped
+
+  # ── Backend API Service (Nwokedi) ────────────────────────────
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: purseagent-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./purseagent.db}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./data:/app/data          # Shared dataset volume
+      - ./apps/ai-agent:/ai-agent # Backend imports AI agent module
+    depends_on:
+      - ai-agent
+    networks:
+      - purseagent-net
+    restart: unless-stopped
+
+  # ── Frontend Dashboard (Victor) ──────────────────────────────
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    container_name: purseagent-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - purseagent-net
+    restart: unless-stopped
+
+  # ── PostgreSQL Database (Optional — comment out for SQLite) ──
+  # db:
+  #   image: postgres:16-alpine
+  #   container_name: purseagent-db
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: purseagent
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   networks:
+  #     - purseagent-net
+
+networks:
+  purseagent-net:
+    driver: bridge
+
+# volumes:
+#   pgdata:

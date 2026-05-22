@@ -1,0 +1,9 @@
+"""
+Dataset download scripts for PurseAgent AI.
+
+Usage:
+    python data/scripts/download_amazon.py
+    python data/scripts/download_yelp.py
+
+Output files go to data/raw/
+"""
