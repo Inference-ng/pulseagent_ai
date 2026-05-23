@@ -42,7 +42,7 @@ def check(label, fn):
 
 print("")
 print("=" * 60)
-print("  PurseAgent AI - Elebiemayo Emmanuel's Task Audit")
+print("  PulseAgent AI - Elebiemayo Emmanuel's Task Audit")
 print("=" * 60)
 
 # ── 1. Core Libraries ────────────────────────────────────────────────────────

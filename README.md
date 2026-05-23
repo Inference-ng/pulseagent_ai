@@ -1,4 +1,4 @@
-# 🤖 PurseAgent AI — BCT Hackathon 2026
+# 🤖 PulseAgent AI — BCT Hackathon 2026
 
 > **Next-Best-Action Customer Intelligence Agent**  
 > A dual-task LLM system for user modeling and personalized recommendation — built for the Bluechip Tech Hackathon 2026.
@@ -9,7 +9,7 @@
 
 ## 🎯 What We Built
 
-**PurseAgent AI** is an intelligent customer agent that:
+**PulseAgent AI** is an intelligent customer agent that:
 
 - **Task A (User Modeling):** Given a user persona and product details, simulates realistic star ratings and written reviews — capturing the user's tone, preferences, and behavioral patterns.
 - **Task B (Recommendation):** Given a user persona, returns a ranked, personalized list of product/item recommendations with contextual reasoning — handling cold-start users and cross-domain scenarios.
@@ -21,7 +21,7 @@ The system is trained on real-world behavioral data from **Yelp**, **Amazon Revi
 ## 🏗️ Repository Structure (Monorepo)
 
 ```
-purseagent-ai/
+pulseagent-ai/
 ├── apps/
 │   ├── frontend/          # React demo dashboard (Victor)
 │   ├── backend/           # FastAPI REST API (Nwokedi)
@@ -55,8 +55,8 @@ purseagent-ai/
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/purseagent-bct/purseagent-ai.git
-cd purseagent-ai
+git clone https://github.com/pulseagent-bct/pulseagent-ai.git
+cd pulseagent-ai
 ```
 
 ### 2. Set up environment variables

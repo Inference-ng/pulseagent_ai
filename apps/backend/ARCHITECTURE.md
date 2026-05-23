@@ -1,6 +1,6 @@
 # Backend Architecture & System Design
 
-**Overview:** Production-ready FastAPI backend for PurseAgent AI using serverless PostgreSQL and modern Python patterns.
+**Overview:** Production-ready FastAPI backend for PulseAgent AI using serverless PostgreSQL and modern Python patterns.
 
 ---
 
@@ -354,8 +354,8 @@ endpoint      | method | status_code | duration_ms | error_msg | created_at
 ### Option 1: Docker Container (Recommended for Hackathon)
 
 ```bash
-docker build -t purseagent-backend .
-docker run -e DATABASE_URL=... -p 8000:8000 purseagent-backend
+docker build -t pulseagent-backend .
+docker run -e DATABASE_URL=... -p 8000:8000 pulseagent-backend
 ```
 
 ### Option 2: Fly.io / Render / Railway

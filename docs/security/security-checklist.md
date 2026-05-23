@@ -1,4 +1,4 @@
-# Security Checklist — PurseAgent AI
+# Security Checklist — PulseAgent AI
 
 > Owner: [4th Team Member]
 > Review with Nwokedi before submission

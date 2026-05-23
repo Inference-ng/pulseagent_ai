@@ -362,11 +362,11 @@ Not valid: `bags`, `clothing`, `tech` (use `electronics` instead)
 ### Docker
 
 ```bash
-docker build -t purseagent-backend .
+docker build -t pulseagent-backend .
 docker run -e GOOGLE_API_KEY="your-key" \
            -e DATABASE_URL="your-neon-url" \
            -p 8000:8000 \
-           purseagent-backend
+           pulseagent-backend
 ```
 
 ### Environment Variables Required

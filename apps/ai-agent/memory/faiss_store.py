@@ -3,14 +3,17 @@ import pickle
 import os
 import logging
 
-# ── Windows Terminal Fix ──────────────────────────────────────────────────────
+# ── Windows Terminal Fix + Offline Mode ───────────────────────────────────────
 # sentence_transformers prints Unicode progress bars (████) during model load.
 # On Windows with cp1252 terminals this causes a silent UnicodeEncodeError crash.
 # These env vars must be set BEFORE importing sentence_transformers.
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"   # disables tqdm HF bars
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"       # silences transformers logs
 os.environ["TOKENIZERS_PARALLELISM"] = "false"       # prevents tokenizer warnings
+os.environ["TRANSFORMERS_OFFLINE"] = "1"             # use cached model — no network
+os.environ["HF_DATASETS_OFFLINE"] = "1"              # no dataset network calls
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)

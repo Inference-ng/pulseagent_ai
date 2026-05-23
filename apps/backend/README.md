@@ -1,4 +1,4 @@
-# 🚀 PurseAgent AI — Backend API
+# 🚀 PulseAgent AI — Backend API
 
 **Version:** 1.0.0 | **Owner:** Nwokedi Ikechukwu | **Stack:** FastAPI + Prisma + Neon PostgreSQL
 
@@ -15,7 +15,7 @@
 
 ## ⚡ What This Does
 
-FastAPI backend for **PurseAgent AI** (BCT Hackathon 2026) with two core endpoints:
+FastAPI backend for **PulseAgent AI** (BCT Hackathon 2026) with two core endpoints:
 
 | Task  | Endpoint                       | Purpose                                      |
 | ----- | ------------------------------ | -------------------------------------------- |
@@ -211,13 +211,13 @@ curl -X POST http://127.0.0.1:8000/api/v1/simulate-review \
 ### Build Container
 
 ```bash
-docker build -t purseagent-backend .
+docker build -t pulseagent-backend .
 ```
 
 ### Run Container
 
 ```bash
-docker run -e DATABASE_URL="postgresql://..." -p 8000:8000 purseagent-backend
+docker run -e DATABASE_URL="postgresql://..." -p 8000:8000 pulseagent-backend
 ```
 
 ### Docker Compose (from root)

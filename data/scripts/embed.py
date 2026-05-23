@@ -15,6 +15,12 @@ import faiss
 
 # ── HuggingFace Auth Fix ──────────────────────────────────────────────────────
 # Force anonymous (public) model access — no HF token needed for all-MiniLM-L6-v2
+# Force offline mode to use the locally cached model without any network calls.
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+os.environ["HF_DATASETS_OFFLINE"] = "1"
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
@@ -24,6 +30,7 @@ huggingface_hub.get_token = lambda *args, **kwargs: None
 for _var in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN", "HUGGINGFACE_HUB_TOKEN"):
     os.environ.pop(_var, None)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 from sentence_transformers import SentenceTransformer
 

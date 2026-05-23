@@ -4,7 +4,7 @@
 ---
 
 ## Your Mission
-Build the visual demo that judges will interact with. This is the **face of PurseAgent AI**. Your dashboard must make it dead-simple for a judge to test both Task A (review simulation) and Task B (recommendations) — and be impressed by the UI.
+Build the visual demo that judges will interact with. This is the **face of PulseAgent AI**. Your dashboard must make it dead-simple for a judge to test both Task A (review simulation) and Task B (recommendations) — and be impressed by the UI.
 
 ---
 

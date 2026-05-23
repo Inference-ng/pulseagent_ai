@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     """FastAPI Application Settings"""
 
     # Database
-    database_url: str = "postgresql://user:password@localhost/purseagent_dev"
+    database_url: str = "postgresql://user:password@localhost/pulseagent_dev"
 
     # API Keys & LLM
     google_api_key: str = ""
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-key"
     environment: str = "development"
     debug: bool = True
-    app_name: str = "PurseAgent AI"
+    app_name: str = "PulseAgent AI"
     app_version: str = "1.0.0"
 
     # CORS

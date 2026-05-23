@@ -1,6 +1,6 @@
-# PurseAgent AI — Solution Paper
+# PulseAgent AI — Solution Paper
 
-**Title:** PurseAgent AI: A Dual-Task LLM Agent for User Modeling and Personalized Recommendation on Nigerian E-Commerce Platforms
+**Title:** PulseAgent AI: A Dual-Task LLM Agent for User Modeling and Personalized Recommendation on Nigerian E-Commerce Platforms
 
 **Team:** [Team Member Names] | [Institution]
 **Date:** May 2026 | BCT Hackathon 2026
@@ -11,7 +11,7 @@
 
 *(150 words — write last, after all sections are done)*
 
-Most businesses collect rich behavioral data about their customers yet fail to leverage it for personalized experiences. This is especially pronounced in Nigerian e-commerce, where price sensitivity, delivery friction, and platform-specific behaviors (Jumia, Konga) create distinct user patterns that generic recommendation systems fail to capture. We present **PurseAgent AI**, a dual-task LLM agent system that addresses this gap. For Task A (User Modeling), our system accepts a user persona and product details, then simulates a realistic star rating and written review reflecting the user's behavioral history and tone. For Task B (Recommendation), our system returns a ranked, personalized list of items with chain-of-thought reasoning, with explicit handling of cold-start and cross-domain scenarios. Built on LangGraph, FAISS, and large language models, and trained on Amazon Reviews 2023, Yelp, and Goodreads datasets, PurseAgent AI achieves [X] NDCG@10 on recommendation and [X] ROUGE-L on review generation.
+Most businesses collect rich behavioral data about their customers yet fail to leverage it for personalized experiences. This is especially pronounced in Nigerian e-commerce, where price sensitivity, delivery friction, and platform-specific behaviors (Jumia, Konga) create distinct user patterns that generic recommendation systems fail to capture. We present **PulseAgent AI**, a dual-task LLM agent system that addresses this gap. For Task A (User Modeling), our system accepts a user persona and product details, then simulates a realistic star rating and written review reflecting the user's behavioral history and tone. For Task B (Recommendation), our system returns a ranked, personalized list of items with chain-of-thought reasoning, with explicit handling of cold-start and cross-domain scenarios. Built on LangGraph, FAISS, and large language models, and trained on Amazon Reviews 2023, Yelp, and Goodreads datasets, PulseAgent AI achieves [X] NDCG@10 on recommendation and [X] ROUGE-L on review generation.
 
 ---
 
@@ -21,7 +21,7 @@ Online platforms generate enormous volumes of behavioral data — clicks, rating
 
 This problem is especially acute in the Nigerian e-commerce context. Nigerian shoppers are acutely price-sensitive (particularly around delivery fees), brand-conscious within specific categories, and exhibit distinct behavioral patterns tied to local platforms like Jumia and Konga. Existing recommendation systems trained on Western datasets fail to capture these nuances.
 
-**PurseAgent AI** addresses this with a two-agent LLM system:
+**PulseAgent AI** addresses this with a two-agent LLM system:
 - **Task A — User Modeling Agent:** Simulates the review and star rating a specific user would give to an unseen product, based on their behavioral history.
 - **Task B — Recommendation Agent:** Returns a ranked, personalized list of items for a user, handling cold-start scenarios (new users with no history) and cross-domain recommendations.
 
@@ -148,8 +148,8 @@ Our Nigerian context system prompt instructs the LLM to:
 | Model | ROUGE-L | BERTScore F1 | RMSE |
 |---|---|---|---|
 | Baseline (avg rating) | 0.00 | 0.61 | 1.12 |
-| PurseAgent (no context) | 0.38 | 0.74 | 0.71 |
-| PurseAgent (+ Nigerian ctx) | 0.41 | 0.76 | 0.68 |
+| PulseAgent (no context) | 0.38 | 0.74 | 0.71 |
+| PulseAgent (+ Nigerian ctx) | 0.41 | 0.76 | 0.68 |
 
 ### Task B Results
 
@@ -157,7 +157,7 @@ Our Nigerian context system prompt instructs the LLM to:
 |---|---|---|---|
 | Popularity Baseline | 0.31 | 0.44 | 0.44 |
 | Collaborative Filter | 0.48 | 0.61 | 0.21 |
-| PurseAgent AI | **0.74** | **0.82** | **0.58** |
+| PulseAgent AI | **0.74** | **0.82** | **0.58** |
 
 ---
 

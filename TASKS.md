@@ -1,6 +1,6 @@
 # 📋 Team Task Assignments
 
-Welcome to the **PurseAgent AI** project. Instead of searching through every folder, refer to this document for your specific responsibilities.
+Welcome to the **PulseAgent AI** project. Instead of searching through every folder, refer to this document for your specific responsibilities.
 
 ---
 

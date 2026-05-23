@@ -224,8 +224,8 @@ All issues identified in previous iterations have been resolved.
 
 1. **Deploy Backend:**
    ```bash
-   docker build -t purseagent-backend .
-   docker run -e GOOGLE_API_KEY="your-key" purseagent-backend
+   docker build -t pulseagent-backend .
+   docker run -e GOOGLE_API_KEY="your-key" pulseagent-backend
    ```
 
 2. **Test with AI Agents:**

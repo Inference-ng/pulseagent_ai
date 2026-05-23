@@ -1,4 +1,4 @@
-# PurseAgent AI — Backend API Documentation
+# PulseAgent AI — Backend API Documentation
 
 **Version:** 1.0.0  
 **Environment:** FastAPI + Prisma ORM + Neon PostgreSQL  
@@ -20,7 +20,7 @@
 
 ## Overview
 
-The PurseAgent AI backend provides two core APIs for the BCT Hackathon 2026:
+The PulseAgent AI backend provides two core APIs for the BCT Hackathon 2026:
 
 - **Task A (Simulate):** Generate realistic user reviews and ratings for products
 - **Task B (Recommend):** Provide personalized product recommendations based on user profile
@@ -93,7 +93,7 @@ Returns server and database status.
 {
   "status": "ok",
   "version": "1.0.0",
-  "app_name": "PurseAgent AI",
+  "app_name": "PulseAgent AI",
   "environment": "development",
   "database": "connected",
   "tasks": ["A", "B"]

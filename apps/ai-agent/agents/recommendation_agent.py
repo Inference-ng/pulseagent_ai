@@ -25,17 +25,32 @@ class RecoAgentState(TypedDict):
 
 
 def retrieve(state: RecoAgentState) -> RecoAgentState:
-    """FAISS semantic search using user preferences + context query."""
+    """FAISS semantic search using user preferences + context query, filtered by domain."""
     from memory.faiss_store import FAISSStore   # lazy import — avoids Windows segfault
     store = FAISSStore()
     persona = state["user_persona"]
+    domain = state["domain"].strip().lower()
     query = state.get("context_query", "").strip()
     if not query:
         query = " ".join(persona.get("preferred_categories", [state["domain"]]))
 
-    results = store.search(query, k=20)
-    state["candidate_products"] = results
+    # Search broadly (top 30) then filter by domain category
+    results = store.search(query, k=30)
+
+    # Filter: keep only items whose category matches the requested domain
+    filtered = [
+        r for r in results
+        if r.get("category", "").strip().lower() == domain
+    ]
+
+    # Relax filter if too few results — fall back to broader semantic matches
+    top_k = state.get("top_k", 5)
+    if len(filtered) < top_k:
+        filtered = results  # use unfiltered if not enough domain-specific items
+
+    state["candidate_products"] = filtered[:20]
     return state
+
 
 
 def cold_start_check(state: RecoAgentState) -> RecoAgentState:

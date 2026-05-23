@@ -1,1 +1,1 @@
-"""PurseAgent AI Backend Application"""
+"""PulseAgent AI Backend Application"""

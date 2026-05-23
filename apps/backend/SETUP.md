@@ -35,8 +35,8 @@
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-org/purseagent_ai.git
-cd purseagent_ai
+git clone https://github.com/your-org/pulseagent_ai.git
+cd pulseagent_ai
 
 # Navigate to backend
 cd apps/backend
@@ -154,7 +154,7 @@ curl http://127.0.0.1:8000/health
 {
   "status": "ok",
   "version": "1.0.0",
-  "app_name": "PurseAgent AI",
+  "app_name": "PulseAgent AI",
   "environment": "development",
   "database": "connected",
   "tasks": ["A", "B"]
@@ -310,7 +310,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/recommend \
 ### Build Container
 
 ```bash
-docker build -t purseagent-backend .
+docker build -t pulseagent-backend .
 ```
 
 ### Run Container
@@ -319,7 +319,7 @@ docker build -t purseagent-backend .
 docker run \
   -e DATABASE_URL="postgresql://..." \
   -p 8000:8000 \
-  purseagent-backend
+  pulseagent-backend
 ```
 
 ---
@@ -334,7 +334,7 @@ DATABASE_URL=postgresql://user:password@host/database
 
 # Optional (defaults provided)
 ENVIRONMENT=development
-APP_NAME=PurseAgent AI
+APP_NAME=PulseAgent AI
 APP_VERSION=1.0.0
 CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```

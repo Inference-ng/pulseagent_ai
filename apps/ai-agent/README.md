@@ -4,7 +4,7 @@
 ---
 
 ## Your Mission
-Build the core intelligence of PurseAgent AI. You own the two LangGraph agents that power both hackathon tasks. The backend calls your agent as a Python module — your output quality determines our score.
+Build the core intelligence of PulseAgent AI. You own the two LangGraph agents that power both hackathon tasks. The backend calls your agent as a Python module — your output quality determines our score.
 
 ---
 

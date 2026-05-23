@@ -1,6 +1,7 @@
 """
 data/loader.py — Loads Amazon Reviews 2023 dataset using the new HuggingFace datasets API.
-Falls back to synthetic Nigerian e-commerce demo data if download fails.
+Falls back to a rich multi-domain synthetic catalog (Amazon, Goodreads, Yelp-style)
+to demonstrate that PulseAgent AI is a domain-agnostic intelligent agent API.
 """
 import os
 import pandas as pd
@@ -73,6 +74,22 @@ def build_synthetic_data():
         {"id": "bty001", "name": "Nivea Body Lotion 400ml", "description": "Popular body lotion in Nigeria. Light and moisturising for our hot weather.", "category": "Beauty", "price": 3800, "brand": "Nivea"},
         {"id": "bty002", "name": "Cantu Shea Butter Leave-In Conditioner", "description": "For natural hair care. Lagos ladies swear by this product.", "category": "Beauty", "price": 6500, "brand": "Cantu"},
         {"id": "bty003", "name": "Black Opal Even True Fade Gel", "description": "Skin brightening gel. Best seller for Nigerian skin tones.", "category": "Beauty", "price": 4200, "brand": "Black Opal"},
+        # Restaurants (Yelp-style — works for hospitality platforms)
+        {"id": "rst001", "name": "The Place Restaurant, Lekki", "description": "Best local Nigerian food and jollof rice in Lagos. Fast service, great for lunch breaks.", "category": "Restaurants", "price": 5000, "brand": "The Place"},
+        {"id": "rst002", "name": "Mega Chicken, Ikeja", "description": "Huge portions of fried rice, chicken, and pastries. Perfect for family outings in Lagos.", "category": "Restaurants", "price": 4500, "brand": "Mega Chicken"},
+        {"id": "rst003", "name": "Shiro Restaurant & Bar", "description": "Premium Pan-Asian dining. Great for upscale date nights and luxury experiences in Victoria Island.", "category": "Restaurants", "price": 45000, "brand": "Shiro"},
+        {"id": "rst004", "name": "Ocean Basket, Victoria Island", "description": "Delicious seafood platters and sushi. Family friendly atmosphere by the Lagos waterfront.", "category": "Restaurants", "price": 18000, "brand": "Ocean Basket"},
+        {"id": "rst005", "name": "Yellow Chilli by Sisi Yemi", "description": "Authentic Nigerian cuisine from celebrity chef. Great for special occasions and events.", "category": "Restaurants", "price": 12000, "brand": "Yellow Chilli"},
+        {"id": "rst006", "name": "Chicken Republic", "description": "Popular fast food chain across Nigeria. Quick, affordable, and reliable for a quick meal.", "category": "Restaurants", "price": 3500, "brand": "Chicken Republic"},
+        # Books (Goodreads-style — works for publishers, bookstores, edtech platforms)
+        {"id": "b001", "name": "Things Fall Apart - Chinua Achebe", "description": "Classic Nigerian literature about Igbo culture and the impact of colonialism. Required reading for every educated Nigerian.", "category": "Books", "price": 3500, "brand": "Heinemann"},
+        {"id": "b002", "name": "Purple Hibiscus - Chimamanda Adichie", "description": "Powerful Nigerian coming-of-age novel. E go move you to tears. Winner of multiple literary awards.", "category": "Books", "price": 4200, "brand": "Farafina"},
+        {"id": "b003", "name": "Rich Dad Poor Dad", "description": "Personal finance bestseller about building wealth and financial literacy. Every Nigerian hustler needs this book.", "category": "Books", "price": 5500, "brand": "Plata Publishing"},
+        {"id": "b004", "name": "Atomic Habits - James Clear", "description": "Practical guide to building good habits and breaking bad ones. Order on Roving Heights bookshop.", "category": "Books", "price": 6800, "brand": "Avery"},
+        {"id": "b005", "name": "The Alchemist - Paulo Coelho", "description": "Inspirational classic about following your dreams. Na motivation in book form, e never get old.", "category": "Books", "price": 4000, "brand": "HarperOne"},
+        {"id": "b006", "name": "Half of a Yellow Sun - Chimamanda Adichie", "description": "Epic novel about the Nigerian-Biafran War. A deep and emotional must-read for history lovers.", "category": "Books", "price": 5800, "brand": "Farafina"},
+        {"id": "b007", "name": "The Psychology of Money - Morgan Housel", "description": "Modern finance book about how people think about money and wealth. Very practical for young professionals.", "category": "Books", "price": 7200, "brand": "Harriman House"},
+        {"id": "b008", "name": "An African in Greenland - Tete-Michel Kpomassie", "description": "Adventure memoir of a Togolese man who traveled to Greenland. Fascinating African travel story.", "category": "Books", "price": 3800, "brand": "NYRB"},
     ]
 
     return pd.DataFrame(products)

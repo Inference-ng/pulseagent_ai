@@ -30,8 +30,8 @@ docs/
 │       ├── task-a-flow.png        # Task A agent flow
 │       └── task-b-flow.png        # Task B agent flow
 ├── pitch-deck/
-│   ├── purseagent-pitch.pptx     # PowerPoint pitch deck
-│   └── purseagent-pitch.pdf      # PDF export
+│   ├── pulseagent-pitch.pptx     # PowerPoint pitch deck
+│   └── pulseagent-pitch.pdf      # PDF export
 ├── security/
 │   └── security-checklist.md     # Security review notes
 └── README.md
@@ -47,7 +47,7 @@ Use this exact structure. Judges read this against the 100-point rubric.
 
 ### Page 1: Title + Abstract
 ```
-Title: PurseAgent AI: A Dual-Task LLM Agent for User Modeling 
+Title: PulseAgent AI: A Dual-Task LLM Agent for User Modeling 
        and Personalized Recommendation on Nigerian E-Commerce Platforms
 
 Team: [Names, Institutions]
@@ -161,7 +161,7 @@ Work with Nwokedi to verify these before submission:
 |---|---|
 | 1 | Title + Team |
 | 2 | The Problem (generic experiences cost businesses money) |
-| 3 | The Solution (PurseAgent AI demo gif) |
+| 3 | The Solution (PulseAgent AI demo gif) |
 | 4 | How It Works (architecture — keep it simple) |
 | 5 | Live Demo (show the dashboard) |
 | 6 | Task A Results (review quality, RMSE) |
@@ -183,7 +183,7 @@ Work with Nwokedi to verify these before submission:
 Before midnight, 24 May 2026:
 
 - [ ] Solution paper PDF (4–8 pages) ready
-- [ ] GitHub repo URL confirmed: `https://github.com/purseagent-bct/purseagent-ai`
+- [ ] GitHub repo URL confirmed: `https://github.com/pulseagent-bct/pulseagent-ai`
 - [ ] Deployed agent URL (get from Nwokedi — could be Railway/Render/localhost)
 - [ ] All three submitted via BCT submission form
 - [ ] Confirmation email received and forwarded to team WhatsApp
