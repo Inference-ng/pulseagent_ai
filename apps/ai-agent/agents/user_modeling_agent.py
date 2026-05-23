@@ -64,7 +64,7 @@ IMPORTANT: You MUST respond with ONLY valid JSON in this exact format (no markdo
     ])
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-pro",
+        model="gemini-2.5-flash",
         temperature=0.7,
         google_api_key=GOOGLE_API_KEY
     )

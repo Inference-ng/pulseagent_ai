@@ -3,7 +3,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.database import connect_db, disconnect_db
 from app.routers import health, simulate, recommend
 
 # Initialize FastAPI app
@@ -25,18 +24,17 @@ app.add_middleware(
 )
 
 
-# Lifespan handlers for database connection
+# Lifespan handlers
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database connection on startup"""
-    await connect_db()
+    """Initialize application on startup without forcing database access."""
+    print("⚠️  Running in database-less mode — API endpoints will work but logging disabled")
     print(f"🚀 {settings.app_name} started on {settings.environment.upper()} mode")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Close database connection on shutdown"""
-    await disconnect_db()
+    """Shut down the application."""
     print(f"🛑 {settings.app_name} shut down")
 
 

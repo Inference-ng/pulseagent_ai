@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://user:password@localhost/purseagent_dev"
 
     # API Keys & LLM
+    google_api_key: str = ""
     openai_api_key: str = ""
     ollama_base_url: str = "http://localhost:11434"
 

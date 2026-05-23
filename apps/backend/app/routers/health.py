@@ -1,7 +1,6 @@
-"""Health Check Router — Database & API Health Status"""
+"""Health Check Router — API Status"""
 
-from fastapi import APIRouter, HTTPException
-from app.database import prisma
+from fastapi import APIRouter
 from app.config import settings
 
 router = APIRouter(prefix="", tags=["health"])
@@ -15,22 +14,11 @@ async def health_check():
     Returns:
         dict with status, version, and database connection status
     """
-    try:
-        # Test database connection with a simple query
-        await prisma.user.count()
-        database_status = "connected"
-    except Exception as e:
-        database_status = f"error: {str(e)}"
-        raise HTTPException(
-            status_code=503,
-            detail="Database connection failed"
-        )
-    
     return {
         "status": "ok",
         "version": settings.app_version,
         "app_name": settings.app_name,
         "environment": settings.environment,
-        "database": database_status,
+        "database": "disabled",
         "tasks": ["A", "B"],
     }

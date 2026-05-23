@@ -132,7 +132,7 @@ Return the top {top_k} ranked recommendations as JSON.
     from langchain_core.messages import SystemMessage, HumanMessage
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-pro",
+        model="gemini-2.5-flash",
         temperature=0.0,
         google_api_key=GOOGLE_API_KEY,
     )
