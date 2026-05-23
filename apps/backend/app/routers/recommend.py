@@ -50,7 +50,7 @@ async def recommend(
         # Call agent with timeout
         try:
             result = await asyncio.wait_for(
-                run_task_b(req.user_persona, req.top_k, req.domain),
+                run_task_b(req.user_persona, req.top_k, req.domain, req.context_query),
                 timeout=AGENT_TIMEOUT,
             )
         except asyncio.TimeoutError:

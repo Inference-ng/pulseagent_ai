@@ -49,7 +49,7 @@ async def run_task_a(user_persona: Dict, product: Dict) -> Dict[str, Any]:
 
 
 async def run_task_b(
-    user_persona: Dict, top_k: int, domain: str
+    user_persona: Dict, top_k: int, domain: str, context_query: str = ""
 ) -> Dict[str, Any]:
     """
     Task B: Get personalized product recommendations.
@@ -76,14 +76,10 @@ async def run_task_b(
         loop = asyncio.get_event_loop()
         with ThreadPoolExecutor() as executor:
             result = await loop.run_in_executor(
-                executor, get_recommendations, user_persona, top_k, domain, ""
+                executor, get_recommendations, user_persona, top_k, domain, context_query
             )
         return result
         
-    except ImportError as e:
-        raise Exception(f"AI agent module not found: {e}")
-    except Exception as e:
-        raise Exception(f"Agent error in Task B: {str(e)}")
     except ImportError as e:
         raise Exception(f"AI agent module not found: {e}")
     except Exception as e:

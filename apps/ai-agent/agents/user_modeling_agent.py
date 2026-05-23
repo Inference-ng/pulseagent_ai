@@ -38,7 +38,18 @@ def retrieve(state: AgentState) -> AgentState:
 
 
 def contextualize(state: AgentState) -> AgentState:
-    """History context is already built. Pass through."""
+    """Build a rich NL context string based on persona and history."""
+    persona = state["user_persona"]
+    history_ctx = state.get("history_context", "")
+    
+    price_sens = persona.get("price_sensitivity", "medium")
+    categories = ", ".join(persona.get("preferred_categories", []))
+    
+    context_str = (
+        f"This user is a {price_sens}-price-sensitive shopper interested in {categories}. "
+        f"{history_ctx}"
+    )
+    state["history_context"] = context_str
     return state
 
 

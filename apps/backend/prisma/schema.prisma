@@ -2,8 +2,8 @@
 // Database: Neon PostgreSQL (serverless)
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./pulseagent.db"
 }
 
 generator client {

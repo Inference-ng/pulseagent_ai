@@ -16,6 +16,8 @@ async def log_simulation(
         result: Simulation result from agent
     """
     try:
+        if not prisma.is_connected():
+            return
         # Ensure user exists
         await prisma.user.upsert(
             where={"user_id": user_id},
@@ -51,6 +53,8 @@ async def log_recommendation(
         is_cold_start: Whether this was a cold-start recommendation
     """
     try:
+        if not prisma.is_connected():
+            return
         # Ensure user exists
         await prisma.user.upsert(
             where={"user_id": user_id},
@@ -84,6 +88,8 @@ async def log_audit(
         error: Error message if any
     """
     try:
+        if not prisma.is_connected():
+            return
         await prisma.auditlog.create(
             data={
                 "endpoint": endpoint,

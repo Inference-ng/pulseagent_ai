@@ -201,13 +201,19 @@ def cross_domain(state: RecoAgentState) -> RecoAgentState:
     if history and len(recs) >= 3:
         existing_categories = {r.get("category", "").lower() for r in recs}
         if len(existing_categories) == 1:
+            import random
+            domains = ["Books & Education", "Electronics", "Food", "Fashion", "Beauty"]
+            current_domain = state["domain"].title()
+            other_domains = [d for d in domains if d != current_domain]
+            cross_domain = random.choice(other_domains) if other_domains else "Books & Education"
+
             # Inject a cross-domain item
             cross_item = {
-                "item_id": "cross_domain_001",
-                "item_name": "Surprise Cross-Domain Pick",
-                "category": "Books & Education",
+                "item_id": f"cross_domain_pick",
+                "item_name": f"Surprise {cross_domain} Pick",
+                "category": cross_domain,
                 "score": 0.55,
-                "reason": "Based on your shopping pattern, you might also like to explore books. No be small thing, knowledge na power!",
+                "reason": f"Based on your shopping pattern, you might also like to explore {cross_domain.lower()}. No be small thing, variety na the spice of life!",
             }
             recs.append(cross_item)
             state["final_result"]["recommendations"] = recs

@@ -60,12 +60,7 @@ def build_synthetic_data():
         {"id": "e003", "name": "Samsung Galaxy A15", "description": "Samsung mid-range phone with great display. Order on Jumia today.", "category": "Electronics", "price": 145000, "brand": "Samsung"},
         {"id": "e004", "name": "JBL Flip 6 Speaker", "description": "Waterproof Bluetooth speaker. Perfect for owambe and parties.", "category": "Electronics", "price": 62000, "brand": "JBL"},
         {"id": "e005", "name": "Xiaomi Redmi Note 13", "description": "Xiaomi budget king with 108MP camera. Competitive price.", "category": "Electronics", "price": 195000, "brand": "Xiaomi"},
-        # Books
-        {"id": "b001", "name": "Things Fall Apart - Chinua Achebe", "description": "Classic Nigerian literature. Required reading for every educated Nigerian.", "category": "Books", "price": 3500, "brand": "Heinemann"},
-        {"id": "b002", "name": "Purple Hibiscus - Chimamanda Adichie", "description": "Powerful Nigerian novel by Chimamanda. E go move you to tears.", "category": "Books", "price": 4200, "brand": "Farafina"},
-        {"id": "b003", "name": "Rich Dad Poor Dad", "description": "Personal finance bestseller. Every Nigerian hustler needs this book.", "category": "Books", "price": 5500, "brand": "Plata Publishing"},
-        {"id": "b004", "name": "Atomic Habits - James Clear", "description": "Life-changing habits book. Order on Roving Heights bookshop.", "category": "Books", "price": 6800, "brand": "Avery"},
-        {"id": "b005", "name": "The Alchemist - Paulo Coelho", "description": "Inspirational classic. Na motivation in book form.", "category": "Books", "price": 4000, "brand": "HarperOne"},
+
         # Food
         {"id": "fd001", "name": "Indomie Instant Noodles (40 Pack)", "description": "The classic Nigerian student staple. Indomie e go always save the day.", "category": "Food", "price": 7500, "brand": "Indomie"},
         {"id": "fd002", "name": "Peak Milk Evaporated (48 Cans)", "description": "Peak milk for your morning tea and garri. Quality guaranteed.", "category": "Food", "price": 18000, "brand": "Peak"},

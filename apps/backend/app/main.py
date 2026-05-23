@@ -27,14 +27,21 @@ app.add_middleware(
 # Lifespan handlers
 @app.on_event("startup")
 async def startup_event():
-    """Initialize application on startup without forcing database access."""
-    print("⚠️  Running in database-less mode — API endpoints will work but logging disabled")
-    print(f"🚀 {settings.app_name} started on {settings.environment.upper()} mode")
+    from app.database import connect_db
+    try:
+        await connect_db()
+        print(f"🚀 {settings.app_name} started on {settings.environment.upper()} mode")
+    except Exception as e:
+        print(f"⚠️ Could not connect to database: {e}. Running in database-less mode.")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Shut down the application."""
+    from app.database import disconnect_db
+    try:
+        await disconnect_db()
+    except Exception:
+        pass
     print(f"🛑 {settings.app_name} shut down")
 
 
