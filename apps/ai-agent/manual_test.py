@@ -98,7 +98,7 @@ def test_task_b():
         "is_cold_start": True
     }
 
-    context_query = "I want a nice shoe for an owambe party this weekend."
+    context_query = "I want a traditional Yoruba outfit for a wedding."
     domain = "Fashion"
 
     print(f"User: Brand new user (Cold-Start)")
