@@ -5,11 +5,17 @@ import sys
 from typing import Any, Dict
 from concurrent.futures import ThreadPoolExecutor
 
-# Add ai-agent module to path (docker: /ai-agent, local: ../ai-agent)
-local_path = "../ai-agent"
+import os
+# Add ai-agent module to path dynamically based on this file's location
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Move up from apps/backend/app/services to apps/ai-agent
+local_path = os.path.abspath(os.path.join(current_dir, "../../../apps/ai-agent"))
 docker_path = "/ai-agent"
-sys.path.insert(0, local_path)
-sys.path.insert(0, docker_path)
+
+if local_path not in sys.path:
+    sys.path.insert(0, local_path)
+if docker_path not in sys.path:
+    sys.path.insert(0, docker_path)
 
 
 async def run_task_a(user_persona: Dict, product: Dict) -> Dict[str, Any]:
