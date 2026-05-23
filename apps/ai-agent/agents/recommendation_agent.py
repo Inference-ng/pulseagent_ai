@@ -10,7 +10,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
-from memory.faiss_store import FAISSStore
+# NOTE: FAISSStore is imported lazily inside retrieve() to prevent a Windows
+# segfault caused by PyTorch + FAISS native DLLs loading at the same time.
 
 
 class RecoAgentState(TypedDict):
@@ -25,6 +26,7 @@ class RecoAgentState(TypedDict):
 
 def retrieve(state: RecoAgentState) -> RecoAgentState:
     """FAISS semantic search using user preferences + context query."""
+    from memory.faiss_store import FAISSStore   # lazy import — avoids Windows segfault
     store = FAISSStore()
     persona = state["user_persona"]
     query = state.get("context_query", "").strip()

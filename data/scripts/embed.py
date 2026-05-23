@@ -1,42 +1,74 @@
+"""
+data/scripts/embed.py
+Reads amazon_fashion.csv (from loader.py), embeds all items with
+sentence-transformers, and writes the FAISS index + metadata to data/processed/.
+
+Run from repo root:
+    python data/scripts/embed.py
+"""
 import os
-import pandas as pd
-from sentence_transformers import SentenceTransformer
-import faiss
+import logging
 import pickle
+
+import pandas as pd
+import faiss
+
+# ── HuggingFace Auth Fix ──────────────────────────────────────────────────────
+# Force anonymous (public) model access — no HF token needed for all-MiniLM-L6-v2
+logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+
+import huggingface_hub
+huggingface_hub.get_token = lambda *args, **kwargs: None
+
+for _var in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN", "HUGGINGFACE_HUB_TOKEN"):
+    os.environ.pop(_var, None)
+# ─────────────────────────────────────────────────────────────────────────────
+
+from sentence_transformers import SentenceTransformer
+
 
 def main():
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../processed"))
     os.makedirs(base_dir, exist_ok=True)
-    
+
     csv_path = os.path.join(base_dir, "amazon_fashion.csv")
     if not os.path.exists(csv_path):
-        print(f"File {csv_path} not found. Run loader.py first.")
+        print(f"[ERROR] {csv_path} not found. Run loader.py first:")
+        print("         python data/scripts/loader.py")
         return
-        
+
     df = pd.read_csv(csv_path)
-    items = df.to_dict('records')
-    
-    print(f"Loading {len(items)} items...")
-    
-    texts = [f"{item.get('name', '')} {item.get('description', '')}" for item in items]
-    
-    print("Loading SentenceTransformer model...")
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    
-    print("Embedding items...")
-    embeddings = model.encode(texts)
-    
-    print("Building FAISS index...")
+    items = df.to_dict("records")
+    print(f"[embed] Loaded {len(items)} items from {csv_path}")
+
+    texts = [
+        f"{item.get('name', '')} {item.get('description', '')}"
+        for item in items
+    ]
+
+    print("[embed] Loading SentenceTransformer model (all-MiniLM-L6-v2)...")
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+
+    print("[embed] Embedding items...")
+    embeddings = model.encode(texts, show_progress_bar=False)
+
+    print("[embed] Building FAISS index...")
     index = faiss.IndexFlatL2(embeddings.shape[1])
     index.add(embeddings)
-    
-    faiss.write_index(index, os.path.join(base_dir, 'items.index'))
-    
+
+    index_path = os.path.join(base_dir, "items.index")
+    meta_path = os.path.join(base_dir, "items_metadata.pkl")
+
+    faiss.write_index(index, index_path)
     metadata = {i: item for i, item in enumerate(items)}
-    with open(os.path.join(base_dir, 'items_metadata.pkl'), 'wb') as f:
+    with open(meta_path, "wb") as f:
         pickle.dump(metadata, f)
-        
-    print("Done building index and metadata.")
+
+    print(f"[embed] Done! {index.ntotal} items indexed.")
+    print(f"        Index  -> {index_path}")
+    print(f"        Metadata -> {meta_path}")
+
 
 if __name__ == "__main__":
     main()
