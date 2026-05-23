@@ -7,14 +7,14 @@ services:
     build:
       context: ./apps/ai-agent
       dockerfile: Dockerfile
-    container_name: purseagent-ai-agent
+    container_name: pulseagent-ai-agent
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
     volumes:
       - ./data:/app/data          # Shared dataset volume
     networks:
-      - purseagent-net
+      - pulseagent-net
     restart: unless-stopped
 
   # ── Backend API Service (Nwokedi) ────────────────────────────
@@ -22,20 +22,20 @@ services:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
-    container_name: purseagent-backend
+    container_name: pulseagent-backend
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./purseagent.db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./pulseagent.db}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     volumes:
       - ./data:/app/data          # Shared dataset volume
       - ./apps/ai-agent:/ai-agent # Backend imports AI agent module
     depends_on:
       - ai-agent
     networks:
-      - purseagent-net
+      - pulseagent-net
     restart: unless-stopped
 
   # ── Frontend Dashboard (Victor) ──────────────────────────────
@@ -43,7 +43,7 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
-    container_name: purseagent-frontend
+    container_name: pulseagent-frontend
     ports:
       - "3000:3000"
     environment:
@@ -51,26 +51,26 @@ services:
     depends_on:
       - backend
     networks:
-      - purseagent-net
+      - pulseagent-net
     restart: unless-stopped
 
   # ── PostgreSQL Database (Optional — comment out for SQLite) ──
   # db:
   #   image: postgres:16-alpine
-  #   container_name: purseagent-db
+  #   container_name: pulseagent-db
   #   environment:
   #     POSTGRES_USER: postgres
   #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: purseagent
+  #     POSTGRES_DB: pulseagent
   #   ports:
   #     - "5432:5432"
   #   volumes:
   #     - pgdata:/var/lib/postgresql/data
   #   networks:
-  #     - purseagent-net
+  #     - pulseagent-net
 
 networks:
-  purseagent-net:
+  pulseagent-net:
     driver: bridge
 
 # volumes:

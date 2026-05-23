@@ -1,4 +1,4 @@
-# PurseAgent AI Backend — Multi-stage Dockerfile (Phase 8)
+# PulseAgent AI Backend — Multi-stage Dockerfile (Phase 8)
 
 FROM python:3.11-slim
 

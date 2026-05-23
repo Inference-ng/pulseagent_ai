@@ -1,4 +1,4 @@
-// PurseAgent AI — Prisma Schema (Phase 2)
+// PulseAgent AI — Prisma Schema (Phase 2)
 // Database: Neon PostgreSQL (serverless)
 
 datasource db {

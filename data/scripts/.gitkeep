@@ -1,5 +1,5 @@
 """
-Dataset download scripts for PurseAgent AI.
+Dataset download scripts for pulseagent AI.
 
 Usage:
     python data/scripts/download_amazon.py

@@ -43,7 +43,7 @@ htmlcov/
 
 # Database
 *.db
-purseagent.db
+pulseagent.db
 .prisma/
 
 # Logs
