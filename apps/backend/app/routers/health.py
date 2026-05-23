@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 from app.config import settings
+from app.database import prisma
 
 router = APIRouter(prefix="", tags=["health"])
 
@@ -19,6 +20,6 @@ async def health_check():
         "version": settings.app_version,
         "app_name": settings.app_name,
         "environment": settings.environment,
-        "database": "disabled",
+        "database": "connected" if prisma.is_connected() else "disabled",
         "tasks": ["A", "B"],
     }

@@ -1,0 +1,36 @@
+id,name,description,category,price,brand
+f001,Nike Air Max 270,Premium sneakers with Air Max cushioning. Perfect for Lagos streets.,Fashion,45000,Nike
+f002,Adidas Ultraboost 22,Running shoes with responsive Boost midsole. Fast delivery on Jumia.,Fashion,52000,Adidas
+f003,Ankara Print Dress,Beautiful Ankara fabric dress. Made in Nigeria. Perfect for owambe.,Fashion,8500,Adire Collections
+f004,Puma Suede Classic,"Iconic Puma suede sneakers. Very comfortable, e no go disappoint.",Fashion,28000,Puma
+f005,Agbada Senator Set,Premium Agbada senator set for men. Perfect for occasions in Abuja.,Fashion,35000,Royal Threads
+f006,Reebok Classic Leather,Timeless Reebok classics. Affordable and durable for daily wear.,Fashion,22000,Reebok
+f007,New Balance 574,Comfortable everyday sneakers. Available on Konga with free delivery.,Fashion,31000,New Balance
+f008,Lace Gown with Beads,Elegant lace gown with bead work. Perfect for Nigerian weddings.,Fashion,18000,Aso-Oke Royale
+f009,Fila Disruptor II,Bold chunky sneakers. Very trendy on Nigerian campuses right now.,Fashion,19500,Fila
+f010,Converse Chuck Taylor,"Classic Converse canvas shoes. No be lie, this one na evergreen.",Fashion,16000,Converse
+e001,Infinix Hot 40i,Budget smartphone with good camera. Best buy under 100k on Slot.,Electronics,85000,Infinix
+e002,Tecno Spark 20,Tecno smartphone with large battery. Perfect for areas with NEPA issues.,Electronics,75000,Tecno
+e003,Samsung Galaxy A15,Samsung mid-range phone with great display. Order on Jumia today.,Electronics,145000,Samsung
+e004,JBL Flip 6 Speaker,Waterproof Bluetooth speaker. Perfect for owambe and parties.,Electronics,62000,JBL
+e005,Xiaomi Redmi Note 13,Xiaomi budget king with 108MP camera. Competitive price.,Electronics,195000,Xiaomi
+fd001,Indomie Instant Noodles (40 Pack),The classic Nigerian student staple. Indomie e go always save the day.,Food,7500,Indomie
+fd002,Peak Milk Evaporated (48 Cans),Peak milk for your morning tea and garri. Quality guaranteed.,Food,18000,Peak
+fd003,Mama's Kitchen Jollof Rice Spice Mix,Authentic Yoruba jollof spice blend. Your jollof go be the talk of town.,Food,2500,Mama's Kitchen
+bty001,Nivea Body Lotion 400ml,Popular body lotion in Nigeria. Light and moisturising for our hot weather.,Beauty,3800,Nivea
+bty002,Cantu Shea Butter Leave-In Conditioner,For natural hair care. Lagos ladies swear by this product.,Beauty,6500,Cantu
+bty003,Black Opal Even True Fade Gel,Skin brightening gel. Best seller for Nigerian skin tones.,Beauty,4200,Black Opal
+rst001,"The Place Restaurant, Lekki","Best local Nigerian food and jollof rice in Lagos. Fast service, great for lunch breaks.",Restaurants,5000,The Place
+rst002,"Mega Chicken, Ikeja","Huge portions of fried rice, chicken, and pastries. Perfect for family outings in Lagos.",Restaurants,4500,Mega Chicken
+rst003,Shiro Restaurant & Bar,Premium Pan-Asian dining. Great for upscale date nights and luxury experiences in Victoria Island.,Restaurants,45000,Shiro
+rst004,"Ocean Basket, Victoria Island",Delicious seafood platters and sushi. Family friendly atmosphere by the Lagos waterfront.,Restaurants,18000,Ocean Basket
+rst005,Yellow Chilli by Sisi Yemi,Authentic Nigerian cuisine from celebrity chef. Great for special occasions and events.,Restaurants,12000,Yellow Chilli
+rst006,Chicken Republic,"Popular fast food chain across Nigeria. Quick, affordable, and reliable for a quick meal.",Restaurants,3500,Chicken Republic
+b001,Things Fall Apart - Chinua Achebe,Classic Nigerian literature about Igbo culture and the impact of colonialism. Required reading for every educated Nigerian.,Books,3500,Heinemann
+b002,Purple Hibiscus - Chimamanda Adichie,Powerful Nigerian coming-of-age novel. E go move you to tears. Winner of multiple literary awards.,Books,4200,Farafina
+b003,Rich Dad Poor Dad,Personal finance bestseller about building wealth and financial literacy. Every Nigerian hustler needs this book.,Books,5500,Plata Publishing
+b004,Atomic Habits - James Clear,Practical guide to building good habits and breaking bad ones. Order on Roving Heights bookshop.,Books,6800,Avery
+b005,The Alchemist - Paulo Coelho,"Inspirational classic about following your dreams. Na motivation in book form, e never get old.",Books,4000,HarperOne
+b006,Half of a Yellow Sun - Chimamanda Adichie,Epic novel about the Nigerian-Biafran War. A deep and emotional must-read for history lovers.,Books,5800,Farafina
+b007,The Psychology of Money - Morgan Housel,Modern finance book about how people think about money and wealth. Very practical for young professionals.,Books,7200,Harriman House
+b008,An African in Greenland - Tete-Michel Kpomassie,Adventure memoir of a Togolese man who traveled to Greenland. Fascinating African travel story.,Books,3800,NYRB

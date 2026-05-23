@@ -61,7 +61,7 @@ def cold_start_check(state: RecoAgentState) -> RecoAgentState:
       Step 3: Scores will be kept low (0.3–0.6) to reflect uncertainty.
     """
     persona = state["user_persona"]
-    if persona.get("is_cold_start", False) and not state["candidate_products"]:
+    if not state["candidate_products"]:
         # Synthetic popular fallback items for the requested domain
         domain = state["domain"]
         fallback_items = [

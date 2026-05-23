@@ -1,5 +1,6 @@
 """Database Service — Prisma Wrapper Methods (Phase 5)"""
 
+import json
 from app.database import prisma
 from typing import Any, Dict, List
 
@@ -29,7 +30,7 @@ async def log_simulation(
             data={
                 "userId": user_id,
                 "productName": product.get("name", ""),
-                "productData": product,
+                "productData": json.dumps(product),
                 "predictedRating": result.get("predicted_rating", 0),
                 "simulatedReview": result.get("simulated_review", ""),
                 "confidence": result.get("confidence", 0),
@@ -65,7 +66,7 @@ async def log_recommendation(
         await prisma.recommendation.create(
             data={
                 "userId": user_id,
-                "recommendationsJson": recommendations,
+                "recommendationsJson": json.dumps(recommendations),
                 "domain": domain,
                 "isColdStart": is_cold_start,
             }

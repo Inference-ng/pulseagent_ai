@@ -40,7 +40,7 @@ async def simulate_review(
         # Call agent with timeout
         try:
             result = await asyncio.wait_for(
-                run_task_a(req.user_persona, req.product),
+                run_task_a(req.user_persona.model_dump(), req.product.model_dump()),
                 timeout=AGENT_TIMEOUT,
             )
         except asyncio.TimeoutError:
@@ -78,8 +78,8 @@ async def simulate_review(
         # Log to database in background
         background_tasks.add_task(
             log_simulation,
-            req.user_persona.get("user_id", "unknown"),
-            req.product,
+            req.user_persona.user_id,
+            req.product.model_dump(),
             result,
         )
         

@@ -1,7 +1,7 @@
 """Application Constants"""
 
 # Valid domains for recommendations
-VALID_DOMAINS = ["fashion", "electronics", "books", "food"]
+VALID_DOMAINS = ["fashion", "electronics", "books", "food", "beauty", "restaurants"]
 
 # Price sensitivity levels
 PRICE_SENSITIVITY = ["low", "medium", "high"]

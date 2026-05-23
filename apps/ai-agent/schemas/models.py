@@ -16,11 +16,6 @@ class Product(BaseModel):
     brand: str
     description: str = ""
 
-class ReviewResult(BaseModel):
-    predicted_rating: float
-    simulated_review: str
-    confidence: float
-    reasoning: str
 
 class RecommendationItem(BaseModel):
     item_id: str

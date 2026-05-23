@@ -1,6 +1,5 @@
 import os
-import json
-import sys
+import re
 from typing import TypedDict
 from dotenv import load_dotenv
 
@@ -14,7 +13,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
 
-from schemas.models import ReviewResult
 from prompts.task_a_prompt import TASK_A_SYSTEM_PROMPT, TASK_A_HUMAN_PROMPT
 
 
@@ -117,7 +115,8 @@ def validate(state: AgentState) -> AgentState:
         res["predicted_rating"] = max(1.0, min(5.0, float(rating) if rating else 3.0))
     # Ensure review is at least 3 sentences (rough check)
     review = res.get("simulated_review", "")
-    if review.count(".") < 2:
+    sentences = [s for s in re.split(r'[.!?]', review) if s.strip()]
+    if len(sentences) < 2:
         res["simulated_review"] = review + " E good o. I go recommend am."
     state["review_result"] = res
     return state

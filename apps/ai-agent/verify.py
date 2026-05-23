@@ -58,7 +58,7 @@ print("\n[2/5] Prompt & Schema modules")
 check("schemas.models",            lambda: __import__("schemas.models"))
 check("prompts.nigerian_context",  lambda: __import__("prompts.nigerian_context"))
 check("prompts.task_a_prompt",     lambda: __import__("prompts.task_a_prompt"))
-check("prompts.task_b_prompt",     lambda: __import__("prompts.task_b_prompt"))
+
 
 # ── 3. Memory / FAISS ────────────────────────────────────────────────────────
 print("\n[3/5] Memory (FAISS store)")
