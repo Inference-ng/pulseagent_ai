@@ -1,5 +1,5 @@
 // PulseAgent AI — Prisma Schema (Phase 2)
-// Database: Neon PostgreSQL (serverless)
+// Database: SQLite (local)
 
 datasource db {
   provider = "sqlite"
