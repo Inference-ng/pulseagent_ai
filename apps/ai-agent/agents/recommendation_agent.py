@@ -197,24 +197,62 @@ def cross_domain(state: RecoAgentState) -> RecoAgentState:
     history = persona.get("purchase_history", [])
     recs = state["final_result"].get("recommendations", [])
 
-    # Only inject if there are at least 3 recs and history is non-empty
     if history and len(recs) >= 3:
         existing_categories = {r.get("category", "").lower() for r in recs}
         if len(existing_categories) == 1:
-            import random
-            domains = ["Books & Education", "Electronics", "Food", "Fashion", "Beauty"]
-            current_domain = state["domain"].title()
-            other_domains = [d for d in domains if d != current_domain]
-            cross_domain = random.choice(other_domains) if other_domains else "Books & Education"
-
-            # Inject a cross-domain item
-            cross_item = {
-                "item_id": f"cross_domain_pick",
-                "item_name": f"Surprise {cross_domain} Pick",
-                "category": cross_domain,
-                "score": 0.55,
-                "reason": f"Based on your shopping pattern, you might also like to explore {cross_domain.lower()}. No be small thing, variety na the spice of life!",
+            # Real cross-domain items by category
+            CROSS_DOMAIN_ITEMS = {
+                "Books & Education": {
+                    "item_id": "cd_book_001",
+                    "item_name": "Atomic Habits by James Clear",
+                    "category": "Books & Education",
+                    "score": 0.55,
+                    "reason": "Based on your shopping pattern, this bestselling self-improvement book is popular among Nigerian professionals. E go add value to your life!",
+                },
+                "Electronics": {
+                    "item_id": "cd_elec_001",
+                    "item_name": "Oraimo FreePods 4 TWS Earbuds",
+                    "category": "Electronics",
+                    "score": 0.55,
+                    "reason": "Top-rated affordable earbuds on Jumia Nigeria — great value, no be lie. Complements your current purchases well.",
+                },
+                "Food": {
+                    "item_id": "cd_food_001",
+                    "item_name": "Suya Spot Signature Combo",
+                    "category": "Food",
+                    "score": 0.55,
+                    "reason": "Nigerians wey know, know say you can't go wrong with suya. A treat that pairs well with any shopping mood.",
+                },
+                "Fashion": {
+                    "item_id": "cd_fashion_001",
+                    "item_name": "Premium Ankara Kaftan",
+                    "category": "Fashion",
+                    "score": 0.55,
+                    "reason": "A classic Nigerian wardrobe staple — perfect for owambe or any occasion. Variety na the spice of life!",
+                },
+                "Beauty": {
+                    "item_id": "cd_beauty_001",
+                    "item_name": "SheaMoisture African Black Soap Bundle",
+                    "category": "Beauty",
+                    "score": 0.55,
+                    "reason": "Highly rated skincare bundle on Jumia — great for Nigerian skin, natural ingredients, no harsh chemicals.",
+                },
+                "Restaurants": {
+                    "item_id": "cd_rest_001",
+                    "item_name": "Chicken Republic Family Meal Deal",
+                    "category": "Restaurants",
+                    "score": 0.55,
+                    "reason": "After all that shopping, you deserve a treat. Chicken Republic dey everywhere for Nigeria — consistent quality.",
+                },
             }
+
+            current_domain = state["domain"].title()
+            other_domains = [d for d in CROSS_DOMAIN_ITEMS.keys() if d.lower() != current_domain.lower()]
+            
+            import random
+            chosen_domain = random.choice(other_domains) if other_domains else "Books & Education"
+            cross_item = CROSS_DOMAIN_ITEMS[chosen_domain]
+
             recs.append(cross_item)
             state["final_result"]["recommendations"] = recs
             state["final_result"]["total"] = len(recs)

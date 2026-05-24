@@ -13,7 +13,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
 
-from prompts.task_a_prompt import TASK_A_SYSTEM_PROMPT, TASK_A_HUMAN_PROMPT
+from prompts.task_a_prompt import TASK_A_HUMAN_PROMPT, TASK_A_BASE_PROMPT
+from prompts.nigerian_context import get_context_for_persona
 
 
 class AgentState(TypedDict):
@@ -47,16 +48,21 @@ def contextualize(state: AgentState) -> AgentState:
         f"This user is a {price_sens}-price-sensitive shopper interested in {categories}. "
         f"{history_ctx}"
     )
+    # Semi-cold-start: fewer than 3 purchases reduces confidence signal
+    history_count = len(persona.get("purchase_history", []))
+    if 0 < history_count < 3:
+        context_str += " Note: sparse purchase history (fewer than 3 items) — widen rating deviation, reduce confidence."
+    
     state["history_context"] = context_str
     return state
-
 
 def generate(state: AgentState) -> AgentState:
     """Call Gemini LLM to produce rating + review."""
     persona = state["user_persona"]
     product = state["product"]
 
-    system_with_json = TASK_A_SYSTEM_PROMPT + """
+    nigerian_ctx = get_context_for_persona(persona)
+    system_with_json = TASK_A_BASE_PROMPT.format(nigerian_context=nigerian_ctx) + """
 
 IMPORTANT: You MUST respond with ONLY valid JSON in this exact format (no markdown, no code blocks):
 {{
