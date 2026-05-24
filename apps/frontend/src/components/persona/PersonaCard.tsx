@@ -1,4 +1,4 @@
-import { ShoppingBag, Star, Tag } from 'lucide-react';
+import { ShoppingBag, Tag } from 'lucide-react';
 import type { UserPersona } from '../../types';
 
 const sensitivityColor: Record<string, string> = {
