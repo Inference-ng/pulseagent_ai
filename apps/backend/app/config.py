@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     """FastAPI Application Settings"""
 
     # Database
-    database_url: str = "postgresql://user:password@localhost/pulseagent_dev"
+    database_url: str = "file:./pulseagent.db"
 
     # API Keys & LLM
     google_api_key: str = ""

@@ -10,8 +10,6 @@ import logging
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"   # disables tqdm HF bars
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"       # silences transformers logs
 os.environ["TOKENIZERS_PARALLELISM"] = "false"       # prevents tokenizer warnings
-os.environ["TRANSFORMERS_OFFLINE"] = "1"             # use cached model — no network
-os.environ["HF_DATASETS_OFFLINE"] = "1"              # no dataset network calls
 # ─────────────────────────────────────────────────────────────────────────────
 
 

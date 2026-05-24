@@ -9,7 +9,7 @@ prisma = Prisma()
 async def connect_db():
     """Connect to the database on startup"""
     await prisma.connect()
-    print("✓ Connected to Neon PostgreSQL")
+    print("✓ Database connected")
 
 
 async def disconnect_db():
