@@ -1,33 +1,29 @@
 import { useState } from 'react';
-import { getRecommendations } from '../lib/api';
+import { getRecommendations, extractErrorMessage } from '../lib/api';
 import type { RecommendationRequest, RecommendationResponse } from '../types';
 
 export function useRecommendations() {
-  const [data, setData] = useState<RecommendationResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData]         = useState<RecommendationResponse | null>(null);
+  const [error, setError]       = useState<string | null>(null);
+  const [isLoading, setLoading] = useState(false);
 
   const submit = async (payload: RecommendationRequest) => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
-
     try {
-      const response = await getRecommendations(payload);
-      setData(response);
-      return response;
-    } catch (caughtError) {
-      const message = caughtError instanceof Error ? caughtError.message : 'Unable to fetch recommendations';
-      setError(message);
-      throw caughtError;
+      const res = await getRecommendations(payload);
+      setData(res);
+      return res;
+    } catch (err) {
+      const msg = extractErrorMessage(err);
+      setError(msg);
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  return {
-    data,
-    error,
-    isLoading,
-    submit,
-  };
+  const reset = () => { setData(null); setError(null); };
+
+  return { data, error, isLoading, submit, reset };
 }

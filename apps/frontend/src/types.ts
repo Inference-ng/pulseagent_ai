@@ -1,5 +1,5 @@
 export type PriceSensitivity = 'low' | 'medium' | 'high';
-export type Domain = 'fashion' | 'electronics' | 'books' | 'food';
+export type Domain = 'fashion' | 'electronics' | 'books' | 'food' | 'beauty' | 'restaurants';
 
 export interface UserPersona {
   user_id: string;
@@ -53,4 +53,13 @@ export interface RecommendationResponse {
   recommendations: RecommendationItem[];
   is_cold_start: boolean;
   total: number;
+}
+
+export interface HealthResponse {
+  status: string;
+  version: string;
+  app_name: string;
+  environment: string;
+  database: string;
+  tasks: string[];
 }

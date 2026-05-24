@@ -1,58 +1,127 @@
 import { useForm } from 'react-hook-form';
 import { Radar } from 'lucide-react';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
- 
+import { ErrorBanner } from '../ui/ErrorBanner';
+import type { Domain, UserPersona } from '../../types';
+
 export interface TaskBFormValues {
-  userId: string;
-  personaDescription: string;
+  domain:       Domain;
+  contextQuery: string;
+  topK:         number;
 }
 
 interface TaskBPanelProps {
-  onSubmit: (values: TaskBFormValues) => Promise<void>;
-  isLoading: boolean;
-  error: string | null;
+  persona:      UserPersona;
+  onSubmit:     (v: TaskBFormValues) => Promise<void>;
+  isLoading:    boolean;
+  error:        string | null;
+  onClearError: () => void;
 }
 
-export function TaskBPanel({
-  onSubmit,
-  isLoading,
-  error,
-}: TaskBPanelProps) {
-  const { register, handleSubmit } = useForm<TaskBFormValues>({
+const DOMAINS: { value: Domain; label: string }[] = [
+  { value: 'fashion',     label: '👗 Fashion'     },
+  { value: 'electronics', label: '📱 Electronics' },
+  { value: 'books',       label: '📚 Books'       },
+  { value: 'food',        label: '🍲 Food'        },
+  { value: 'beauty',      label: '✨ Beauty'      },
+  { value: 'restaurants', label: '🍽️ Restaurants' },
+];
+
+function inferDomain(text: string): Domain {
+  const q = text.toLowerCase();
+  if (/(food|eat|meal|snack|drink|suya|jollof|restaurant|amala)/.test(q)) return 'food';
+  if (/(book|read|course|learn|study|novel)/.test(q)) return 'books';
+  if (/(phone|laptop|earbud|tv|device|gadget|charger|tech)/.test(q)) return 'electronics';
+  if (/(beauty|skincare|makeup|lipstick|cream|serum)/.test(q)) return 'beauty';
+  if (/(restaurant|bar|lounge|eatery|kitchen)/.test(q)) return 'restaurants';
+  return 'fashion';
+}
+
+export function TaskBPanel({ persona, onSubmit, isLoading, error, onClearError }: TaskBPanelProps) {
+  const { register, handleSubmit, watch, setValue } = useForm<TaskBFormValues>({
     defaultValues: {
-      userId: 'tunde_03',
-      personaDescription: 'Lagos foodie, loves local restaurants',
+      domain:       inferDomain(persona.context ?? persona.preferred_categories.join(' ')),
+      contextQuery: persona.context ?? '',
+      topK:         10,
     },
   });
 
+  const contextQuery = watch('contextQuery');
+
+  // Auto-infer domain from context
+  const handleContextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue('contextQuery', e.target.value);
+    if (e.target.value.trim().length > 5) {
+      setValue('domain', inferDomain(e.target.value));
+    }
+  };
+
   return (
-    <section className="panel-card">
-      <div className="flex items-center justify-between gap-4">
+    <section className="card">
+      <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.28em] text-mist">Task B</p>
-          <h2 className="mt-2 text-xl font-semibold text-ink">Recommender</h2>
+          <p className="eyebrow mb-1">Task B — Recommendation</p>
+          <h2 className="text-lg font-bold text-ink">Recommender</h2>
+          <p className="mt-0.5 text-xs text-mist">
+            Ranking for <span className="font-semibold text-emerald">{persona.name ?? persona.user_id}</span>
+            {persona.is_cold_start && (
+              <span className="ml-1.5 badge-amber text-[10px]">cold start</span>
+            )}
+          </p>
         </div>
-        <Radar className="h-5 w-5 text-emerald" />
+        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald/10 border border-emerald/20">
+          <Radar className="h-4 w-4 text-emerald" />
+        </span>
       </div>
 
-      <form className="mt-6 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-        <label className="field-label">
-          User ID (optional)
-          <input className="field-input" placeholder="tunde_03" {...register('userId')} />
-        </label>
-        <label className="field-label">
-          Persona description
+      <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
+        <label className="field-label sm:col-span-2">
+          Context / Shopping intent
           <textarea
-            className="field-input min-h-28 resize-none"
-            placeholder="Lagos foodie, loves local restaurants"
-            {...register('personaDescription')}
+            className="field-input min-h-24 resize-none"
+            placeholder="e.g. I need an owambe outfit for a Lagos wedding…"
+            value={contextQuery}
+            {...register('contextQuery')}
+            onChange={handleContextChange}
           />
-          <span className="text-xs text-mist">Provide either a User ID or persona description.</span>
+          <span className="normal-case font-normal text-dim text-[11px]">Domain is inferred automatically from your text.</span>
         </label>
-        <button type="submit" disabled={isLoading} className="action-button disabled:cursor-not-allowed disabled:opacity-70">
-          {isLoading ? <LoadingSpinner message="Building user profile..." /> : 'Get Recommendations'}
+
+        <label className="field-label">
+          Domain
+          <select className="field-input" {...register('domain')}>
+            {DOMAINS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="field-label">
+          Results (top-K)
+          <input
+            className="field-input"
+            type="number"
+            min="1" max="20"
+            {...register('topK', { valueAsNumber: true })}
+          />
+        </label>
+
+        {error && (
+          <div className="sm:col-span-2">
+            <ErrorBanner message={error} onDismiss={onClearError} />
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="btn-primary sm:col-span-2"
+        >
+          {isLoading
+            ? <LoadingSpinner message="Ranking items…" />
+            : <><Radar className="h-4 w-4" />Get Recommendations</>
+          }
         </button>
-        {error ? <p className="text-sm text-danger">{error}</p> : null}
       </form>
     </section>
   );

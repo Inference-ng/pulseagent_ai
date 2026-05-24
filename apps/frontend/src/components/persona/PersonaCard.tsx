@@ -1,72 +1,94 @@
-import { ShoppingBag, Star } from 'lucide-react';
+import { ShoppingBag, Star, Tag } from 'lucide-react';
 import type { UserPersona } from '../../types';
 
-interface PersonaCardProps {
-  persona: UserPersona;
-}
+const sensitivityColor: Record<string, string> = {
+  high:   'badge-danger',
+  medium: 'badge-amber',
+  low:    'badge-emerald',
+};
+const sensitivityLabel: Record<string, string> = {
+  high: 'High sensitivity', medium: 'Mid sensitivity', low: 'Low sensitivity',
+};
+
+interface PersonaCardProps { persona: UserPersona; }
 
 export function PersonaCard({ persona }: PersonaCardProps) {
   return (
-    <article className="panel-card">
+    <div className="card animate-in">
+      {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-4xl">{persona.avatar ?? '🧑🏾'}</p>
-          <h2 className="mt-4 text-2xl font-semibold text-ink">{persona.name ?? persona.user_id}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-mist">{persona.description ?? 'Custom persona ready for evaluation.'}</p>
+        <div className="flex items-center gap-3">
+          <span className="text-4xl leading-none">{persona.avatar ?? '🧑🏾'}</span>
+          <div>
+            <h2 className="text-lg font-bold text-ink">{persona.name ?? persona.user_id}</h2>
+            <p className="text-xs text-mist">{persona.description}</p>
+          </div>
         </div>
-        <div className="rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-right">
-          <p className="text-xs uppercase tracking-[0.22em] text-mist">Price sensitivity</p>
-          <p className="mt-2 text-sm font-semibold capitalize text-ink">{persona.price_sensitivity}</p>
+        <span className={sensitivityColor[persona.price_sensitivity]}>
+          {sensitivityLabel[persona.price_sensitivity]}
+        </span>
+      </div>
+
+      <div className="divider my-4" />
+
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="card-sm text-center">
+          <p className="eyebrow mb-1">Avg Rating</p>
+          <p className="text-xl font-bold text-ink">
+            {persona.avg_rating_given !== null ? persona.avg_rating_given.toFixed(1) : '—'}
+          </p>
+          <p className="text-[10px] text-mist">/ 5.0</p>
+        </div>
+        <div className="card-sm text-center">
+          <p className="eyebrow mb-1">Purchases</p>
+          <p className="text-xl font-bold text-ink">{persona.purchase_history.length}</p>
+          <p className="text-[10px] text-mist">items</p>
+        </div>
+        <div className="card-sm text-center">
+          <p className="eyebrow mb-1">Mode</p>
+          <p className="text-sm font-bold text-ink">{persona.is_cold_start ? 'Cold' : 'Warm'}</p>
+          <p className="text-[10px] text-mist">start</p>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-3xl border border-white/10 bg-black/10 p-4">
-          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-mist">
-            <ShoppingBag className="h-4 w-4" />
-            Purchase history
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {/* Purchase history */}
+        <div className="card-sm">
+          <p className="eyebrow mb-2 flex items-center gap-1">
+            <ShoppingBag className="h-3 w-3" />History
           </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {persona.purchase_history.length > 0 ? (
-              persona.purchase_history.map((item) => (
-                <span key={item} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-ink">
-                  {item}
-                </span>
-              ))
-            ) : (
-              <span className="text-sm text-mist">No purchase history available.</span>
-            )}
+          <div className="flex flex-wrap gap-1.5">
+            {persona.purchase_history.length > 0
+              ? persona.purchase_history.map((item) => (
+                  <span key={item} className="badge-mist truncate max-w-[120px]" title={item}>{item}</span>
+                ))
+              : <span className="text-xs text-mist italic">No history — cold start</span>
+            }
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-black/10 p-4">
-          <p className="text-xs uppercase tracking-[0.22em] text-mist">Preferred categories</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {persona.preferred_categories.length > 0 ? (
-              persona.preferred_categories.map((category) => (
-                <span key={category} className="rounded-full border border-emerald/20 bg-emerald/10 px-3 py-1 text-xs font-medium capitalize text-emerald">
-                  {category}
-                </span>
-              ))
-            ) : (
-              <span className="text-sm text-mist">No category preferences captured.</span>
-            )}
+        {/* Preferred categories */}
+        <div className="card-sm">
+          <p className="eyebrow mb-2 flex items-center gap-1">
+            <Tag className="h-3 w-3" />Categories
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {persona.preferred_categories.length > 0
+              ? persona.preferred_categories.map((cat) => (
+                  <span key={cat} className="badge-emerald capitalize">{cat}</span>
+                ))
+              : <span className="text-xs text-mist italic">None captured yet</span>
+            }
           </div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-black/10 p-4">
-          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-mist">
-            <Star className="h-4 w-4" />
-            Average rating given
-          </p>
-          <p className="mt-3 text-3xl font-semibold text-ink">
-            {persona.avg_rating_given !== null ? persona.avg_rating_given.toFixed(1) : 'N/A'}
-          </p>
-          <p className="mt-2 text-sm text-mist">
-            {persona.is_cold_start ? 'Cold-start mode is active for this profile.' : 'Existing behavior signals are available.'}
-          </p>
         </div>
       </div>
-    </article>
+
+      {persona.context && (
+        <p className="mt-4 rounded-xl border border-white/[0.06] bg-surface/50 px-4 py-3 text-xs leading-relaxed text-mist italic">
+          "{persona.context}"
+        </p>
+      )}
+    </div>
   );
 }

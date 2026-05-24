@@ -1,183 +1,193 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { ReviewResult } from '../components/results/ReviewResult';
-import { RecommendationList } from '../components/results/RecommendationList';
-import { TaskAPanel, type TaskAFormValues } from '../components/tasks/TaskAPanel';
-import { TaskBPanel, type TaskBFormValues } from '../components/tasks/TaskBPanel';
-import { useRecommendations } from '../hooks/useRecommendations';
-import { useSimulateReview } from '../hooks/useSimulateReview';
-
-function inferDomain(text: string) {
-  const query = text.toLowerCase();
-
-  if (/(food|restaurant|eat|meal|snack|drink)/.test(query)) {
-    return 'food' as const;
-  }
-
-  if (/(book|read|course|learn|study)/.test(query)) {
-    return 'books' as const;
-  }
-
-  if (/(phone|laptop|earbud|tv|device|electronics)/.test(query)) {
-    return 'electronics' as const;
-  }
-
-  return 'fashion' as const;
-}
+import { PersonaStrip }         from '../components/persona/PersonaStrip';
+import { PersonaCard }          from '../components/persona/PersonaCard';
+import { PersonaBuilder }       from '../components/persona/PersonaBuilder';
+import { TaskAPanel }           from '../components/tasks/TaskAPanel';
+import { TaskBPanel }           from '../components/tasks/TaskBPanel';
+import { ReviewResult }         from '../components/results/ReviewResult';
+import { RecommendationList }   from '../components/results/RecommendationList';
+import { EmptyState }           from '../components/ui/EmptyState';
+import { SkeletonResult, SkeletonRecommendations } from '../components/results/SkeletonResult';
+import { useSimulateReview }    from '../hooks/useSimulateReview';
+import { useRecommendations }   from '../hooks/useRecommendations';
+import { DEMO_PERSONAS }        from '../data/demo-personas';
+import type { UserPersona, Domain } from '../types';
+import type { TaskAFormValues } from '../components/tasks/TaskAPanel';
+import type { TaskBFormValues } from '../components/tasks/TaskBPanel';
 
 export function DemoPage() {
-  const [lastTaskBInput, setLastTaskBInput] = useState<TaskBFormValues>({
-    userId: 'tunde_03',
-    personaDescription: 'Lagos foodie, loves local restaurants',
-  });
-  const [followUp, setFollowUp] = useState('');
-  const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
+  // ── Persona state ─────────────────────────────────────────
+  const [personas, setPersonas]         = useState<UserPersona[]>(DEMO_PERSONAS);
+  const [selectedId, setSelectedId]     = useState<string>(DEMO_PERSONAS[0].user_id);
+  const [showBuilder, setShowBuilder]   = useState(false);
 
+  const selectedPersona = personas.find((p) => p.user_id === selectedId) ?? personas[0];
+
+  const handleSavePersona = useCallback((p: UserPersona) => {
+    setPersonas((prev) => {
+      const exists = prev.findIndex((x) => x.user_id === p.user_id);
+      if (exists >= 0) {
+        const next = [...prev]; next[exists] = p; return next;
+      }
+      return [...prev, p];
+    });
+    setSelectedId(p.user_id);
+  }, []);
+
+  // ── Task A ────────────────────────────────────────────────
   const review = useSimulateReview();
-  const recommendations = useRecommendations();
 
-  const handleTaskASubmit = async (values: TaskAFormValues) => {
+  const handleTaskASubmit = useCallback(async (v: TaskAFormValues) => {
     await review.submit({
       user_persona: {
-        user_id: values.userId,
-        purchase_history: [],
-        avg_rating_given: null,
-        price_sensitivity: 'medium',
-        preferred_categories: [],
-        is_cold_start: true,
+        user_id:              selectedPersona.user_id,
+        purchase_history:     selectedPersona.purchase_history,
+        avg_rating_given:     selectedPersona.avg_rating_given,
+        price_sensitivity:    selectedPersona.price_sensitivity,
+        preferred_categories: selectedPersona.preferred_categories,
+        is_cold_start:        selectedPersona.is_cold_start,
+        context:              selectedPersona.context,
       },
       product: {
-        name: values.itemName,
-        category: 'fashion',
-        price: 50000,
+        name:        v.itemName,
+        category:    v.itemCategory,
+        price:       v.itemPrice,
+        brand:       v.itemBrand    || undefined,
+        description: v.itemDescription || undefined,
       },
     });
-  };
+  }, [selectedPersona, review]);
 
-  const handleTaskBSubmit = async (values: TaskBFormValues) => {
-    setLastTaskBInput(values);
+  // ── Task B ────────────────────────────────────────────────
+  const recommendations = useRecommendations();
+  const [followUpLoading, setFollowUpLoading] = useState(false);
+  const [lastBValues, setLastBValues] = useState<TaskBFormValues>({
+    domain: 'fashion', contextQuery: '', topK: 10,
+  });
 
-    const normalizedUserId = values.userId.trim() || `persona_${Date.now()}`;
-    const normalizedPersona = values.personaDescription.trim();
-
+  const handleTaskBSubmit = useCallback(async (v: TaskBFormValues) => {
+    setLastBValues(v);
     await recommendations.submit({
       user_persona: {
-        user_id: normalizedUserId,
-        name: normalizedUserId,
-        purchase_history: [],
-        avg_rating_given: null,
-        price_sensitivity: 'medium',
-        preferred_categories: [],
-        is_cold_start: true,
-        context: normalizedPersona,
+        user_id:              selectedPersona.user_id,
+        purchase_history:     selectedPersona.purchase_history,
+        avg_rating_given:     selectedPersona.avg_rating_given,
+        price_sensitivity:    selectedPersona.price_sensitivity,
+        preferred_categories: selectedPersona.preferred_categories,
+        is_cold_start:        selectedPersona.is_cold_start,
+        context:              selectedPersona.context,
       },
-      top_k: 10,
-      domain: inferDomain(normalizedPersona),
-      context_query: normalizedPersona || 'Recommend items based on this user profile.',
+      top_k:         v.topK,
+      domain:        v.domain as Domain,
+      context_query: v.contextQuery || selectedPersona.context || '',
     });
-  };
+  }, [selectedPersona, recommendations]);
 
-  const handleFollowUp = async () => {
-    const followUpText = followUp.trim();
-
-    if (!followUpText) {
-      return;
-    }
-
-    setIsFollowUpLoading(true);
+  const handleFollowUp = useCallback(async (query: string) => {
+    setFollowUpLoading(true);
     try {
-      const combinedPersona = [lastTaskBInput.personaDescription.trim(), followUpText].filter(Boolean).join(' ');
+      const combined = [lastBValues.contextQuery, query].filter(Boolean).join('. ');
       await recommendations.submit({
         user_persona: {
-          user_id: lastTaskBInput.userId.trim() || `persona_${Date.now()}`,
-          purchase_history: [],
-          avg_rating_given: null,
-          price_sensitivity: 'medium',
-          preferred_categories: [],
-          is_cold_start: true,
-          context: combinedPersona,
+          user_id:              selectedPersona.user_id,
+          purchase_history:     selectedPersona.purchase_history,
+          avg_rating_given:     selectedPersona.avg_rating_given,
+          price_sensitivity:    selectedPersona.price_sensitivity,
+          preferred_categories: selectedPersona.preferred_categories,
+          is_cold_start:        selectedPersona.is_cold_start,
+          context:              selectedPersona.context,
         },
-        top_k: 10,
-        domain: inferDomain(combinedPersona),
-        context_query: combinedPersona,
+        top_k:         lastBValues.topK,
+        domain:        lastBValues.domain as Domain,
+        context_query: combined,
       });
-      setFollowUp('');
     } finally {
-      setIsFollowUpLoading(false);
+      setFollowUpLoading(false);
     }
+  }, [selectedPersona, lastBValues, recommendations]);
+
+  // ── When persona changes, clear results ───────────────────
+  const handleSelectPersona = (id: string) => {
+    setSelectedId(id);
+    review.reset();
+    recommendations.reset();
   };
 
   return (
-    <div className="space-y-6 py-8">
-      <motion.section
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: 'easeOut' }}
-        className="grid gap-6 lg:grid-cols-2"
-      >
-        <div className="space-y-6">
-          <TaskAPanel onSubmit={handleTaskASubmit} isLoading={review.isLoading} error={review.error} />
+    <div className="space-y-6 py-6 sm:py-8">
 
-          {review.data ? (
-            <ReviewResult result={review.data} />
-          ) : (
+      {/* ── Persona strip ── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+        <PersonaStrip
+          personas={personas}
+          selectedId={selectedId}
+          onSelect={handleSelectPersona}
+          onBuildCustom={() => setShowBuilder((v) => !v)}
+        />
+      </motion.div>
+
+      {/* ── Custom persona builder ── */}
+      {showBuilder && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <PersonaBuilder onSave={handleSavePersona} onClose={() => setShowBuilder(false)} />
+        </motion.div>
+      )}
+
+      {/* ── Selected persona detail card ── */}
+      <PersonaCard persona={selectedPersona} />
+
+      <div className="divider" />
+
+      {/* ── Task panels ── */}
+      <div className="grid gap-6 lg:grid-cols-2">
+
+        {/* Task A column */}
+        <div className="space-y-5">
+          <TaskAPanel
+            persona={selectedPersona}
+            onSubmit={handleTaskASubmit}
+            isLoading={review.isLoading}
+            error={review.error}
+            onClearError={() => review.reset()}
+          />
+          {review.isLoading && <SkeletonResult />}
+          {!review.isLoading && review.data && <ReviewResult result={review.data} />}
+          {!review.isLoading && !review.data && !review.error && (
             <EmptyState
               title="Review output"
-              description="Simulate a review to see a star rating and generated review text with a live typewriter reveal."
+              description="Fill in a product above and hit Simulate Review. The agent will generate a rating and authentic Nigerian review text."
+              icon="✍️"
             />
           )}
         </div>
 
-        <div className="space-y-6">
-          <TaskBPanel onSubmit={handleTaskBSubmit} isLoading={recommendations.isLoading} error={recommendations.error} />
-
-          {recommendations.data ? (
-            <>
-              <RecommendationList result={recommendations.data} />
-              <section className="panel-card">
-                <p className="text-xs uppercase tracking-[0.28em] text-mist">Conversation</p>
-                <h3 className="mt-2 text-xl font-semibold text-ink">Ask a follow-up</h3>
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                  <input
-                    className="field-input"
-                    placeholder="Ask a follow-up"
-                    value={followUp}
-                    onChange={(event) => setFollowUp(event.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleFollowUp}
-                    disabled={isFollowUpLoading || !followUp.trim()}
-                    className="action-button whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-70"
-                  >
-                    {isFollowUpLoading ? 'Thinking...' : 'Send'}
-                  </button>
-                </div>
-              </section>
-            </>
-          ) : (
+        {/* Task B column */}
+        <div className="space-y-5">
+          <TaskBPanel
+            persona={selectedPersona}
+            onSubmit={handleTaskBSubmit}
+            isLoading={recommendations.isLoading}
+            error={recommendations.error}
+            onClearError={() => recommendations.reset()}
+          />
+          {recommendations.isLoading && <SkeletonRecommendations />}
+          {!recommendations.isLoading && recommendations.data && (
+            <RecommendationList
+              result={recommendations.data}
+              onFollowUp={handleFollowUp}
+              isFollowUpLoading={followUpLoading}
+            />
+          )}
+          {!recommendations.isLoading && !recommendations.data && !recommendations.error && (
             <EmptyState
               title="Recommendation output"
-              description="Get recommendations to see a ranked list of 10 items with scores and one-line explanations."
+              description="Describe what your user is shopping for and hit Get Recommendations. Results are ranked by FAISS + Gemini re-ranking."
+              icon="🎯"
             />
           )}
         </div>
-      </motion.section>
+      </div>
     </div>
-  );
-}
-
-interface EmptyStateProps {
-  title: string;
-  description: string;
-}
-
-function EmptyState({ title, description }: EmptyStateProps) {
-  return (
-    <section className="panel-card flex min-h-72 flex-col justify-center">
-      <p className="text-xs uppercase tracking-[0.28em] text-mist">Awaiting result</p>
-      <h3 className="mt-3 text-2xl font-semibold text-ink">{title}</h3>
-      <p className="mt-4 max-w-xl text-sm leading-7 text-mist">{description}</p>
-    </section>
   );
 }
