@@ -1,0 +1,48 @@
+import type { UserPersona } from '../types';
+
+export const DEMO_PERSONAS: UserPersona[] = [
+  {
+    user_id: 'emmanuel_01',
+    name: 'Emmanuel (Lagos)',
+    avatar: '🧑🏿',
+    description: 'Price-sensitive sneaker lover from Lagos',
+    purchase_history: ['Nike Air Force 1', 'Adidas Slides', 'Puma Socks'],
+    avg_rating_given: 3.2,
+    price_sensitivity: 'high',
+    preferred_categories: ['footwear', 'sportswear'],
+    is_cold_start: false,
+  },
+  {
+    user_id: 'chioma_02',
+    name: 'Chioma (Abuja)',
+    avatar: '👩🏿',
+    description: 'Fashion-forward Abuja professional',
+    purchase_history: ['Zara Dress', 'Mac Lipstick', 'Aldo Heels'],
+    avg_rating_given: 4.5,
+    price_sensitivity: 'low',
+    preferred_categories: ['fashion', 'beauty'],
+    is_cold_start: false,
+  },
+  {
+    user_id: 'tunde_03',
+    name: 'Tunde (Kano) - NEW USER',
+    avatar: '👨🏿',
+    description: 'New user, no purchase history',
+    purchase_history: [],
+    avg_rating_given: null,
+    price_sensitivity: 'medium',
+    preferred_categories: [],
+    is_cold_start: true,
+  },
+  {
+    user_id: 'ngozi_04',
+    name: 'Ngozi (PH)',
+    avatar: '👩🏿‍💼',
+    description: 'Book lover and online learner from Port Harcourt',
+    purchase_history: ['Rich Dad Poor Dad', 'Atomic Habits', 'Coursera Sub'],
+    avg_rating_given: 4.8,
+    price_sensitivity: 'medium',
+    preferred_categories: ['books', 'education'],
+    is_cold_start: false,
+  },
+];
