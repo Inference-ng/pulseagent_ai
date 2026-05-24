@@ -39,9 +39,9 @@ export function HomePage() {
         <div className="absolute -right-24 top-10 h-56 w-56 rounded-full bg-emerald/15 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-amber/10 blur-3xl" />
 
-        <p className="relative text-xs uppercase tracking-[0.32em] text-emerald">PurseAgent AI frontend</p>
+        <p className="relative text-xs uppercase tracking-[0.32em] text-emerald">PulseAgent AI frontend</p>
         <h1 className="relative mt-4 max-w-4xl text-4xl font-semibold leading-tight text-ink sm:text-5xl lg:text-6xl">
-          Meet PurseAgent AI - The Agent That Knows Your Customers
+          Meet PulseAgent AI - The Agent That Knows Your Customers
         </h1>
         <p className="relative mt-6 max-w-2xl text-base leading-8 text-mist sm:text-lg">
           Explore Task A review simulation and Task B recommendations through a polished demo built for judges, with Nigerian personas, smooth motion,

@@ -1,7 +1,7 @@
 
 
 # CONTEXT
-You are building the **React demo dashboard** for PurseAgent AI. This is what judges will interact with. Make it visually impressive — dark mode, smooth animations, Nigerian-themed personas. It must clearly demonstrate both Task A and Task B.
+You are building the **React demo dashboard** for PulseAgent AI. This is what judges will interact with. Make it visually impressive — dark mode, smooth animations, Nigerian-themed personas. It must clearly demonstrate both Task A and Task B.
 
 Work directory: `apps/frontend/`
 Backend API is at: `http://localhost:8000`
@@ -74,7 +74,7 @@ Four pre-built Nigerian personas:
 
 ## TASK 6: Implement `src/pages/Home.jsx`
 Hero section with:
-- Large headline: "Meet PurseAgent AI — The Agent That Knows Your Customers"
+- Large headline: "Meet PulseAgent AI — The Agent That Knows Your Customers"
 - Subtitle explaining Task A and Task B
 - Two CTA buttons: "Try Task A (Review Simulation)" and "Try Task B (Recommendations)"
 - Animated stat cards: "78% purchase accuracy", "10ms response", "3 datasets"
@@ -123,7 +123,7 @@ Display each recommendation as a card:
 - If cold-start → show yellow banner: "Cold-Start Mode: Recommendations based on context only"
 
 ## TASK 12: Implement `src/components/layout/Navbar.jsx`
-- Logo: "PurseAgent AI" with emerald dot
+- Logo: "PulseAgent AI" with emerald dot
 - Links: Home | Demo
 - GitHub link (opens repo in new tab)
 - Dark background, blur backdrop

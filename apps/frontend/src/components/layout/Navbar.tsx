@@ -13,7 +13,7 @@ export function Navbar() {
         <NavLink to="/" className="flex items-center gap-3 text-sm font-semibold tracking-[0.18em] text-ink">
           <span className="h-3 w-3 rounded-full bg-emerald shadow-[0_0_18px_rgba(16,185,129,0.9)]" />
           <span>
-            PurseAgent AI
+            PulseAgent AI
             <span className="block text-[0.64rem] font-medium tracking-[0.18em] text-mist">
               Judge-ready frontend dashboard
             </span>
@@ -36,7 +36,7 @@ export function Navbar() {
             </NavLink>
           ))}
           <a
-            href="https://github.com"
+            href="https://github.com/Inference-ng/pulseagent_ai"
             target="_blank"
             rel="noreferrer"
             className="hidden items-center gap-2 rounded-full bg-amber px-4 py-2 text-sm font-semibold text-canvas sm:inline-flex"
