@@ -51,7 +51,7 @@ class FAISSStore:
         self.metadata_path = metadata_path or os.path.join(base_dir, "items_metadata.pkl")
 
         # Load the public embedding model (no auth needed)
-        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.model = SentenceTransformer("paraphrase-MiniLM-L3-v2")
         self.index = None
         self.metadata: Dict[int, dict] = {}
 

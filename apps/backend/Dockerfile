@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/
 COPY apps/backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-MiniLM-L3-v2')"
 
 COPY apps/backend/ .
 COPY apps/ai-agent/ /ai-agent
