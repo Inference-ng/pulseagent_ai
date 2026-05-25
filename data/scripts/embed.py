@@ -59,7 +59,7 @@ def main():
     ]
 
     print("[embed] Loading SentenceTransformer model (all-MiniLM-L6-v2)...")
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = SentenceTransformer("paraphrase-MiniLM-L3-v2")
 
     print("[embed] Embedding items...")
     embeddings = model.encode(texts, batch_size=512, show_progress_bar=True, convert_to_numpy=True)
