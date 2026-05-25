@@ -53,14 +53,28 @@ class FAISSStore:
     def _keyword_search(self, query: str, k: int) -> List[Dict[str, Any]]:
         """Fast keyword search — no neural model needed."""
         query_words = set(query.lower().split())
+        # Remove common stop words that add noise
+        stop_words = {'i', 'a', 'the', 'for', 'and', 'or', 'in', 'on', 'at', 'to', 'of', 'is', 'it', 'me'}
+        query_words = query_words - stop_words
+
         scored = []
         for item in self.metadata.values():
             text = f"{item.get('name','')} {item.get('description','')} {item.get('category','')}".lower()
             score = sum(1 for w in query_words if w in text)
             stars = float(item.get('stars', 3.0) or 3.0)
+            # Always give a base score so items are never all zero
             scored.append((score + stars / 10.0, item))
+
         scored.sort(key=lambda x: x[0], reverse=True)
-        return [item for _, item in scored[:k]]
+        results = [item for _, item in scored[:k]]
+
+        # If nothing scored above zero, return top items by star rating
+        if not results or all(s == 0 for s, _ in scored[:k]):
+            by_stars = sorted(self.metadata.values(),
+                            key=lambda x: float(x.get('stars', 0) or 0),
+                            reverse=True)
+            return by_stars[:k]
+        return results
 
     def search(self, query: str, k: int = 10) -> List[Dict[str, Any]]:
         if not self.metadata:
