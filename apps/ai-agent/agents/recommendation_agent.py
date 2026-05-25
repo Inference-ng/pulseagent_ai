@@ -43,9 +43,11 @@ def retrieve(state: RecoAgentState) -> RecoAgentState:
     results = store.search(query, k=50)
 
     # Filter: keep only items whose category matches the requested domain
+    # Filter: keep only items whose category matches the requested domain
     filtered = [
         r for r in results
         if r.get("category", "").strip().lower() == domain
+        or domain in r.get("category", "").strip().lower()
     ]
 
     # Relax filter if too few results — fall back to broader semantic matches
@@ -201,70 +203,95 @@ Return the top {top_k} ranked recommendations as JSON.
 
 
 def cross_domain(state: RecoAgentState) -> RecoAgentState:
-    """If user history is in one domain, inject one cross-domain suggestion."""
-    persona = state["user_persona"]
-    history = persona.get("purchase_history", [])
-    recs = state["final_result"].get("recommendations", [])
+    """
+    Cross-domain injection — ONLY when context query explicitly
+    suggests interest outside the selected domain.
+    A fashion platform stays fashion. A books platform stays books.
+    Cross-domain is opt-in via the user's own query, not forced.
+    """
+    persona  = state["user_persona"]
+    domain   = state["domain"].lower()
+    query    = state.get("context_query", "").lower()
+    recs     = state["final_result"].get("recommendations", [])
 
-    if history and len(recs) >= 3:
-        existing_categories = {r.get("category", "").lower() for r in recs}
-        if len(existing_categories) == 1:
-            # Real cross-domain items by category
-            CROSS_DOMAIN_ITEMS = {
-                "Books & Education": {
-                    "item_id": "cd_book_001",
-                    "item_name": "Atomic Habits by James Clear",
-                    "category": "Books & Education",
-                    "score": 0.55,
-                    "reason": "Based on your shopping pattern, this bestselling self-improvement book is popular among Nigerian professionals. E go add value to your life!",
-                },
-                "Electronics": {
-                    "item_id": "cd_elec_001",
-                    "item_name": "Oraimo FreePods 4 TWS Earbuds",
-                    "category": "Electronics",
-                    "score": 0.55,
-                    "reason": "Top-rated affordable earbuds on Jumia Nigeria — great value, no be lie. Complements your current purchases well.",
-                },
-                "Food": {
-                    "item_id": "cd_food_001",
-                    "item_name": "Suya Spot Signature Combo",
-                    "category": "Food",
-                    "score": 0.55,
-                    "reason": "Nigerians wey know, know say you can't go wrong with suya. A treat that pairs well with any shopping mood.",
-                },
-                "Fashion": {
-                    "item_id": "cd_fashion_001",
-                    "item_name": "Premium Ankara Kaftan",
-                    "category": "Fashion",
-                    "score": 0.55,
-                    "reason": "A classic Nigerian wardrobe staple — perfect for owambe or any occasion. Variety na the spice of life!",
-                },
-                "Beauty": {
-                    "item_id": "cd_beauty_001",
-                    "item_name": "SheaMoisture African Black Soap Bundle",
-                    "category": "Beauty",
-                    "score": 0.55,
-                    "reason": "Highly rated skincare bundle on Jumia — great for Nigerian skin, natural ingredients, no harsh chemicals.",
-                },
-                "Restaurants": {
-                    "item_id": "cd_rest_001",
-                    "item_name": "Chicken Republic Family Meal Deal",
-                    "category": "Restaurants",
-                    "score": 0.55,
-                    "reason": "After all that shopping, you deserve a treat. Chicken Republic dey everywhere for Nigeria — consistent quality.",
-                },
-            }
+    # Keywords that suggest the user wants something OUTSIDE their domain
+    CROSS_SIGNALS = {
+        "fashion":     ["book", "read", "novel", "learn", "food", "eat", "restaurant", "tech", "phone", "gadget"],
+        "electronics": ["book", "read", "novel", "learn", "food", "eat", "restaurant", "wear", "cloth", "fashion"],
+        "books":       ["wear", "cloth", "fashion", "shoe", "food", "eat", "restaurant", "phone", "gadget"],
+        "food":        ["book", "read", "wear", "cloth", "fashion", "phone", "gadget", "electronics"],
+        "beauty":      ["book", "read", "food", "eat", "phone", "gadget", "electronics"],
+        "restaurants": ["book", "read", "wear", "cloth", "fashion", "phone", "gadget"],
+    }
 
-            current_domain = state["domain"].title()
-            other_domains = [d for d in CROSS_DOMAIN_ITEMS.keys() if d.lower() != current_domain.lower()]
-            
-            import random
-            chosen_domain = random.choice(other_domains) if other_domains else "Books & Education"
-            cross_item = CROSS_DOMAIN_ITEMS[chosen_domain]
+    signals = CROSS_SIGNALS.get(domain, [])
+    user_wants_cross_domain = any(word in query for word in signals)
 
-            recs.append(cross_item)
-            state["final_result"]["recommendations"] = recs
-            state["final_result"]["total"] = len(recs)
+    # Only inject cross-domain if the query explicitly signals it
+    if not user_wants_cross_domain:
+        return state
+
+    # Also require minimum recs and purchase history
+    if len(recs) < 3 or persona.get("is_cold_start", False):
+        return state
+
+    CROSS_DOMAIN_ITEMS = {
+        "Books & Education": {
+            "item_id":   "cd_book_001",
+            "item_name": "Atomic Habits by James Clear",
+            "category":  "Books & Education",
+            "score":     0.55,
+            "reason":    "Based on your query, this self-improvement book is highly rated among Nigerian professionals. E go add value!",
+        },
+        "Electronics": {
+            "item_id":   "cd_elec_001",
+            "item_name": "Oraimo FreePods 4 TWS Earbuds",
+            "category":  "Electronics",
+            "score":     0.55,
+            "reason":    "Top-rated affordable earbuds on Jumia Nigeria — great value, no be lie.",
+        },
+        "Food": {
+            "item_id":   "cd_food_001",
+            "item_name": "Suya Spot Signature Combo",
+            "category":  "Food",
+            "score":     0.55,
+            "reason":    "Nigerians wey know say you can't go wrong with suya after shopping.",
+        },
+        "Fashion": {
+            "item_id":   "cd_fashion_001",
+            "item_name": "Premium Ankara Kaftan",
+            "category":  "Fashion",
+            "score":     0.55,
+            "reason":    "A classic Nigerian wardrobe staple — perfect for owambe or any occasion.",
+        },
+        "Beauty": {
+            "item_id":   "cd_beauty_001",
+            "item_name": "SheaMoisture African Black Soap Bundle",
+            "category":  "Beauty",
+            "score":     0.55,
+            "reason":    "Highly rated natural skincare on Jumia — great for Nigerian skin.",
+        },
+        "Restaurants": {
+            "item_id":   "cd_rest_001",
+            "item_name": "Chicken Republic Family Meal Deal",
+            "category":  "Restaurants",
+            "score":     0.55,
+            "reason":    "After all that shopping, you deserve a treat. Chicken Republic dey everywhere!",
+        },
+    }
+
+    current_domain = domain.title()
+    other_domains  = [d for d in CROSS_DOMAIN_ITEMS if d.lower() != current_domain.lower()]
+
+    import random
+    chosen    = random.choice(other_domains) if other_domains else None
+    if not chosen:
+        return state
+
+    cross_item = CROSS_DOMAIN_ITEMS[chosen]
+    recs.append(cross_item)
+    state["final_result"]["recommendations"] = recs
+    state["final_result"]["total"] = len(recs)
 
     return state
 
