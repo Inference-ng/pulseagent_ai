@@ -84,7 +84,7 @@ class FAISSStore:
         if not items or not self._use_neural:
             return
         texts = [
-            f"{item.get('name','')} {item.get('description','')} {item.get('category','')}}"
+            f"{item.get('name','')} {item.get('description','')} {item.get('category','')}"
             for item in items
         ]
         embeddings = self.model.encode(texts, convert_to_numpy=True)
