@@ -11,4 +11,4 @@ MIN_RATING = 1.0
 MAX_RATING = 5.0
 
 # API timeouts (in seconds)
-AGENT_TIMEOUT = 60
+AGENT_TIMEOUT = 120

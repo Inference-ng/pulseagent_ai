@@ -10,8 +10,14 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
-# NOTE: FAISSStore is imported lazily inside retrieve() to prevent a Windows
-# segfault caused by PyTorch + FAISS native DLLs loading at the same time.
+
+# ── Singleton FAISS store ─────────────────────────────────────────────────────
+# Loaded ONCE at module import time. Loading inside retrieve() on every call
+# costs 15-25 seconds per request (SentenceTransformer model load) and causes
+# the 60-second backend timeout to trigger.
+from memory.faiss_store import FAISSStore as _FAISSStore
+_FAISS_STORE = _FAISSStore()   # loaded once, reused on every request
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 class RecoAgentState(TypedDict):
@@ -26,8 +32,7 @@ class RecoAgentState(TypedDict):
 
 def retrieve(state: RecoAgentState) -> RecoAgentState:
     """FAISS semantic search using user preferences + context query, filtered by domain."""
-    from memory.faiss_store import FAISSStore   # lazy import — avoids Windows segfault
-    store = FAISSStore()
+    store = _FAISS_STORE   # use the singleton — already loaded at startup
     persona = state["user_persona"]
     domain = state["domain"].strip().lower()
     query = state.get("context_query", "").strip()

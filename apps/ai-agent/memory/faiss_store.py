@@ -85,11 +85,10 @@ class FAISSStore:
         if not items:
             return
         texts = [
-            f"{item.get('name', '')} {item.get('description', '')}"
+            f"{item.get('name', '')} {item.get('description', '')} {item.get('category', '')}"
             for item in items
         ]
-        query_embedding = self.model.encode([query])
-        distances, indices = self.index.search(query_embedding, k)
+        embeddings = self.model.encode(texts, convert_to_numpy=True)
         start_id = len(self.metadata)
         for i, item in enumerate(items):
             self.metadata[start_id + i] = item
@@ -103,8 +102,8 @@ class FAISSStore:
         """
         if self.index is None or self.index.ntotal == 0:
             return []
-        query_embedding = self.model.encode([query])
-        distances, indices = self.index.search(query_embedding, k)
+        query_embedding = self.model.encode([query], convert_to_numpy=True)
+        distances, indices = self.index.search(query_embedding, min(k, self.index.ntotal))
         results = []
         for i, idx in enumerate(indices[0]):
             if idx != -1 and idx in self.metadata:
