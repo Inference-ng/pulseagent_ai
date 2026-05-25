@@ -63,6 +63,11 @@ class FAISSStore:
             self.index = faiss.read_index(self.index_path)
             with open(self.metadata_path, "rb") as f:
                 self.metadata = pickle.load(f)
+            # Normalise category capitalisation at load time so domain
+            # filtering (lower-case comparison) works correctly.
+            for v in self.metadata.values():
+                if isinstance(v.get("category"), str):
+                    v["category"] = v["category"].strip().title()
         else:
             # Empty flat L2 index (384 = all-MiniLM-L6-v2 embedding size)
             self.index = faiss.IndexFlatL2(384)
@@ -83,7 +88,8 @@ class FAISSStore:
             f"{item.get('name', '')} {item.get('description', '')}"
             for item in items
         ]
-        embeddings = self.model.encode(texts)
+        query_embedding = self.model.encode([query])
+        distances, indices = self.index.search(query_embedding, k)
         start_id = len(self.metadata)
         for i, item in enumerate(items):
             self.metadata[start_id + i] = item

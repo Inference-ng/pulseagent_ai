@@ -16,8 +16,8 @@ import faiss
 # ── HuggingFace Auth Fix ──────────────────────────────────────────────────────
 # Force anonymous (public) model access — no HF token needed for all-MiniLM-L6-v2
 # Force offline mode to use the locally cached model without any network calls.
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
-os.environ["HF_DATASETS_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "0"
+os.environ["HF_DATASETS_OFFLINE"] = "0"
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -46,11 +46,15 @@ def main():
         return
 
     df = pd.read_csv(csv_path)
+    for col in ("name", "description", "category", "price", "brand"):
+        if col not in df.columns:
+            df[col] = ""
+    df = df.fillna("")
     items = df.to_dict("records")
     print(f"[embed] Loaded {len(items)} items from {csv_path}")
 
     texts = [
-        f"{item.get('name', '')} {item.get('description', '')}"
+        f"{item.get('name', '')} {item.get('description', '')} {item.get('category', '')}"
         for item in items
     ]
 
@@ -58,7 +62,7 @@ def main():
     model = SentenceTransformer("all-MiniLM-L6-v2")
 
     print("[embed] Embedding items...")
-    embeddings = model.encode(texts, show_progress_bar=False)
+    embeddings = model.encode(texts, batch_size=512, show_progress_bar=True, convert_to_numpy=True)
 
     print("[embed] Building FAISS index...")
     index = faiss.IndexFlatL2(embeddings.shape[1])

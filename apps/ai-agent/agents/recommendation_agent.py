@@ -34,8 +34,8 @@ def retrieve(state: RecoAgentState) -> RecoAgentState:
     if not query:
         query = " ".join(persona.get("preferred_categories", [state["domain"]]))
 
-    # Search broadly (top 30) then filter by domain category
-    results = store.search(query, k=30)
+    # Search broadly (top 50) then filter by domain category
+    results = store.search(query, k=50)
 
     # Filter: keep only items whose category matches the requested domain
     filtered = [
@@ -99,11 +99,14 @@ def rank(state: RecoAgentState) -> RecoAgentState:
     # Format candidates for LLM
     candidates_str = ""
     for i, c in enumerate(candidates[:20], 1):
+        stars_info   = f", Stars: {c.get('stars', 'N/A')}"   if c.get("stars")        else ""
+        reviews_info = f", Reviews: {c.get('review_count')}" if c.get("review_count") else ""
         candidates_str += (
             f"{i}. Name: {c.get('name', 'Unknown')}, "
             f"Category: {c.get('category', 'N/A')}, "
             f"Price: ₦{c.get('price', 0)}, "
-            f"Brand: {c.get('brand', 'N/A')}\n"
+            f"Brand: {c.get('brand', 'N/A')}"
+            f"{stars_info}{reviews_info}\n"
         )
 
     confidence_note = "Since this is a cold-start user, assign confidence scores between 0.3 and 0.6." if is_cold_start else "Assign confidence scores between 0.6 and 0.95 based on persona fit."
@@ -112,6 +115,7 @@ def rank(state: RecoAgentState) -> RecoAgentState:
 Given a user persona and candidate products, select and rank the top {top_k} most relevant items.
 {confidence_note}
 Include one cross-domain suggestion if the user's history is domain-specific.
+Consider the product's star rating and review count as quality signals when available.
 
 IMPORTANT: Respond ONLY with valid JSON — no markdown, no code fences:
 {{

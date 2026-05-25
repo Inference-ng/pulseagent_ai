@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
 
     # CORS
-    cors_origins: str = "http://localhost:3000,http://localhost:5173"
+    cors_origins: str = "http://localhost:3000,http://localhost:5173,https://pulseagent-ai.vercel.app"
 
     class Config:
         """Pydantic config"""
