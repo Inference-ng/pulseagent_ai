@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { Github } from 'lucide-react';
 import { useApiHealth } from '../../hooks/useApiHealth';
 
-const GITHUB_URL = 'https://github.com/pulseagent-bct/pulseagent-ai';
+const GITHUB_URL = 'https://github.com/Inference-ng/pulseagent_ai';
 
 export function Navbar() {
   const { status } = useApiHealth();
