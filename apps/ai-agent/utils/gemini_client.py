@@ -1,18 +1,6 @@
 """
 apps/ai-agent/utils/gemini_client.py
-Shared Gemini REST client used by both Task A and Task B agents.
-
-Key fixes vs the original:
-  1. Logs the REAL error per attempt instead of silently swallowing it.
-  2. Removes `responseMimeType: application/json` — this flag is only
-     supported on a subset of Gemini models/regions and was the most
-     likely cause of silent 400 failures on Render's free tier.
-     JSON is enforced via the prompt instead (already done in both agents).
-  3. Tries gemini-2.0-flash first (more capable, same price tier on free quota),
-     then falls back to gemini-2.0-flash-lite.
-  4. Raises a RuntimeError that includes the actual last error message,
-     so the fallback `reasoning` field shows something useful in the UI.
-  5. Increases per-request timeout to 45 s (Render cold-starts are slow).
+Shared Gemini REST client — supports multiple API keys for rate limit rotation.
 """
 
 import json
@@ -25,90 +13,106 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Model priority list — most capable first, cheaper model as fallback
-# ---------------------------------------------------------------------------
-_MODELS = ["gemini-2.0-flash", "gemini-2.0-flash-lite"]
+# Free tier: flash-lite has higher RPM (~15) than flash (~2), so try it first
+_MODELS = ["gemini-2.0-flash-lite", "gemini-2.0-flash"]
+
+
+def _get_api_keys() -> list[str]:
+    """Load all available API keys from environment."""
+    keys = [
+        os.environ.get("GOOGLE_API_KEY", ""),
+        os.environ.get("GOOGLE_API_KEY_2", ""),
+    ]
+    return [k.strip() for k in keys if k.strip()]
 
 
 def call_gemini(system_prompt: str, user_message: str, temperature: float = 0.7) -> dict:
     """
     Call the Gemini REST API and return a parsed JSON dict.
 
-    Tries each model in _MODELS with 2 attempts each.
-    Raises RuntimeError (with the real error message) if all attempts fail.
+    Rotates through all available API keys and models.
+    On 429, switches to the next key immediately before waiting.
+    Raises RuntimeError with the real error message if everything fails.
     """
-    api_key = os.environ.get("GOOGLE_API_KEY", "")
-    if not api_key:
-        raise RuntimeError("GOOGLE_API_KEY is not set in environment variables.")
+    api_keys = _get_api_keys()
+    if not api_keys:
+        raise RuntimeError("No Gemini API keys found. Set GOOGLE_API_KEY or GOOGLE_API_KEY_2.")
 
     last_error: Exception | None = None
 
-    for model_name in _MODELS:
-        for attempt in range(2):
-            url = (
-                f"https://generativelanguage.googleapis.com/v1beta/models/"
-                f"{model_name}:generateContent?key={api_key}"
-            )
-            payload = {
-                # system_instruction is supported on all v1beta Gemini models
-                "system_instruction": {"parts": [{"text": system_prompt}]},
-                "contents": [{"parts": [{"text": user_message}]}],
-                "generationConfig": {
-                    # NOTE: responseMimeType removed — it caused silent 400 errors
-                    # on free-tier Render deploys for flash-lite. JSON output is
-                    # enforced via the prompt ("Respond ONLY with valid JSON...").
-                    "temperature": temperature,
-                    "maxOutputTokens": 1024,
-                },
-            }
+    for key_index, api_key in enumerate(api_keys):
+        logger.info("[Gemini] Trying API key %d/%d", key_index + 1, len(api_keys))
 
-            try:
-                response = httpx.post(url, json=payload, timeout=45)
+        for model_name in _MODELS:
+            for attempt in range(2):  # 2 attempts per model per key
+                url = (
+                    f"https://generativelanguage.googleapis.com/v1beta/models/"
+                    f"{model_name}:generateContent?key={api_key}"
+                )
+                payload = {
+                    "system_instruction": {"parts": [{"text": system_prompt}]},
+                    "contents": [{"parts": [{"text": user_message}]}],
+                    "generationConfig": {
+                        "temperature": temperature,
+                        "maxOutputTokens": 1024,
+                    },
+                }
 
-                # Rate-limited — back off and retry
-                if response.status_code == 429:
-                    wait_secs = (attempt + 1) * 5
-                    logger.warning(
-                        "[Gemini] 429 rate limit on %s attempt %d — waiting %ds",
-                        model_name, attempt + 1, wait_secs,
+                try:
+                    response = httpx.post(url, json=payload, timeout=45)
+
+                    # Rate limited — switch to next key immediately, short wait
+                    if response.status_code == 429:
+                        last_error = RuntimeError(
+                            f"429 rate limit on key {key_index + 1}, {model_name}, attempt {attempt + 1}"
+                        )
+                        logger.warning("[Gemini] %s", last_error)
+                        if attempt == 0:
+                            # Give it one quick retry on same key after short wait
+                            time.sleep(10)
+                            continue
+                        else:
+                            # Both attempts on this model exhausted — try next model
+                            break
+
+                    # Other HTTP error — log and try next model
+                    if not response.is_success:
+                        last_error = RuntimeError(
+                            f"HTTP {response.status_code} from key {key_index + 1}, "
+                            f"{model_name}: {response.text[:400]}"
+                        )
+                        logger.error("[Gemini] %s", last_error)
+                        break  # try next model
+
+                    # Success — parse response
+                    data = response.json()
+                    raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+                    # Strip markdown fences just in case
+                    raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
+                    raw_text = re.sub(r"\s*```$", "", raw_text)
+
+                    parsed = json.loads(raw_text)
+                    logger.info(
+                        "[Gemini] Success — key %d/%d, model %s",
+                        key_index + 1, len(api_keys), model_name,
                     )
-                    time.sleep(wait_secs)
-                    continue
+                    return parsed
 
-                # Any other non-2xx — log and try next model
-                if not response.is_success:
+                except json.JSONDecodeError as e:
                     last_error = RuntimeError(
-                        f"HTTP {response.status_code} from {model_name}: {response.text[:300]}"
+                        f"JSON parse error from {model_name}: {e}. Raw: {raw_text[:300]}"
                     )
                     logger.error("[Gemini] %s", last_error)
-                    break  # don't retry same model on non-429 HTTP errors
+                    continue
 
-                data = response.json()
+                except Exception as e:
+                    last_error = e
+                    logger.error(
+                        "[Gemini] key %d, %s attempt %d failed — %s: %s",
+                        key_index + 1, model_name, attempt + 1, type(e).__name__, e,
+                    )
+                    time.sleep((attempt + 1) * 3)
+                    continue
 
-                # Parse response text
-                raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-
-                # Strip markdown code fences if the model wrapped the JSON anyway
-                raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
-                raw_text = re.sub(r"\s*```$", "", raw_text)
-
-                return json.loads(raw_text)
-
-            except json.JSONDecodeError as e:
-                last_error = RuntimeError(f"JSON parse error from {model_name}: {e}. Raw: {raw_text[:200]}")
-                logger.error("[Gemini] %s", last_error)
-                continue
-
-            except Exception as e:  # network errors, timeouts, etc.
-                last_error = e
-                logger.error(
-                    "[Gemini] %s attempt %d failed: %s: %s",
-                    model_name, attempt + 1, type(e).__name__, e,
-                )
-                time.sleep((attempt + 1) * 2)  # brief back-off before retry
-                continue
-
-    raise RuntimeError(
-        f"All Gemini models failed. Last error: {last_error}"
-    )
+    raise RuntimeError(f"All Gemini API keys and models exhausted. Last error: {last_error}")
