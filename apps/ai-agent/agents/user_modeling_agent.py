@@ -21,7 +21,7 @@ def _call_gemini(system_prompt: str, user_message: str) -> dict:
 
     client = genai.Client(api_key=GOOGLE_API_KEY)
 
-    for model_name in ["gemini-2.5-flash-preview-05-20", "gemini-2.0-flash", "gemini-1.5-flash-latest"]:
+    for model_name in ["gemini-1.5-flash", "gemini-1.5-pro"]:
         try:
             response = client.models.generate_content(
                 model=model_name,
