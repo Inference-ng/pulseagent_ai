@@ -1,6 +1,6 @@
 """
 apps/ai-agent/utils/gemini_client.py
-Shared Gemini REST client — supports multiple API keys for rate limit rotation.
+Shared Gemini REST client — fast key/model rotation on 429, no long waits.
 """
 
 import json
@@ -31,7 +31,7 @@ def call_gemini(system_prompt: str, user_message: str, temperature: float = 0.7)
     Call the Gemini REST API and return a parsed JSON dict.
 
     Rotates through all available API keys and models.
-    On 429, switches to the next key immediately before waiting.
+    On 429, moves to the next key/model immediately — no long waits.
     Raises RuntimeError with the real error message if everything fails.
     """
     api_keys = _get_api_keys()
@@ -44,75 +44,68 @@ def call_gemini(system_prompt: str, user_message: str, temperature: float = 0.7)
         logger.info("[Gemini] Trying API key %d/%d", key_index + 1, len(api_keys))
 
         for model_name in _MODELS:
-            for attempt in range(2):  # 2 attempts per model per key
-                url = (
-                    f"https://generativelanguage.googleapis.com/v1beta/models/"
-                    f"{model_name}:generateContent?key={api_key}"
-                )
-                payload = {
-                    "system_instruction": {"parts": [{"text": system_prompt}]},
-                    "contents": [{"parts": [{"text": user_message}]}],
-                    "generationConfig": {
-                        "temperature": temperature,
-                        "maxOutputTokens": 1024,
-                    },
-                }
+            url = (
+                f"https://generativelanguage.googleapis.com/v1beta/models/"
+                f"{model_name}:generateContent?key={api_key}"
+            )
+            payload = {
+                "system_instruction": {"parts": [{"text": system_prompt}]},
+                "contents": [{"parts": [{"text": user_message}]}],
+                "generationConfig": {
+                    "temperature": temperature,
+                    "maxOutputTokens": 1024,
+                },
+            }
 
-                try:
-                    response = httpx.post(url, json=payload, timeout=45)
+            try:
+                response = httpx.post(url, json=payload, timeout=45)
 
-                    # Rate limited — switch to next key immediately, short wait
-                    if response.status_code == 429:
-                        last_error = RuntimeError(
-                            f"429 rate limit on key {key_index + 1}, {model_name}, attempt {attempt + 1}"
-                        )
-                        logger.warning("[Gemini] %s", last_error)
-                        if attempt == 0:
-                            # Give it one quick retry on same key after short wait
-                            time.sleep(10)
-                            continue
-                        else:
-                            # Both attempts on this model exhausted — try next model
-                            break
-
-                    # Other HTTP error — log and try next model
-                    if not response.is_success:
-                        last_error = RuntimeError(
-                            f"HTTP {response.status_code} from key {key_index + 1}, "
-                            f"{model_name}: {response.text[:400]}"
-                        )
-                        logger.error("[Gemini] %s", last_error)
-                        break  # try next model
-
-                    # Success — parse response
-                    data = response.json()
-                    raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-
-                    # Strip markdown fences just in case
-                    raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
-                    raw_text = re.sub(r"\s*```$", "", raw_text)
-
-                    parsed = json.loads(raw_text)
-                    logger.info(
-                        "[Gemini] Success — key %d/%d, model %s",
-                        key_index + 1, len(api_keys), model_name,
-                    )
-                    return parsed
-
-                except json.JSONDecodeError as e:
+                # Rate limited — move to next model/key immediately, no sleep
+                if response.status_code == 429:
                     last_error = RuntimeError(
-                        f"JSON parse error from {model_name}: {e}. Raw: {raw_text[:300]}"
+                        f"429 rate limit on key {key_index + 1}, {model_name}"
+                    )
+                    logger.warning("[Gemini] %s — skipping immediately", last_error)
+                    continue  # try next model right away
+
+                # Other HTTP error — log and try next model
+                if not response.is_success:
+                    last_error = RuntimeError(
+                        f"HTTP {response.status_code} from key {key_index + 1}, "
+                        f"{model_name}: {response.text[:400]}"
                     )
                     logger.error("[Gemini] %s", last_error)
-                    continue
+                    continue  # try next model
 
-                except Exception as e:
-                    last_error = e
-                    logger.error(
-                        "[Gemini] key %d, %s attempt %d failed — %s: %s",
-                        key_index + 1, model_name, attempt + 1, type(e).__name__, e,
-                    )
-                    time.sleep((attempt + 1) * 3)
-                    continue
+                # Success — parse response
+                data = response.json()
+                raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+                # Strip markdown fences just in case
+                raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
+                raw_text = re.sub(r"\s*```$", "", raw_text)
+
+                parsed = json.loads(raw_text)
+                logger.info(
+                    "[Gemini] Success — key %d/%d, model %s",
+                    key_index + 1, len(api_keys), model_name,
+                )
+                return parsed
+
+            except json.JSONDecodeError as e:
+                last_error = RuntimeError(
+                    f"JSON parse error from {model_name}: {e}. Raw: {raw_text[:300]}"
+                )
+                logger.error("[Gemini] %s", last_error)
+                continue
+
+            except Exception as e:
+                last_error = e
+                logger.error(
+                    "[Gemini] key %d, %s failed — %s: %s",
+                    key_index + 1, model_name, type(e).__name__, e,
+                )
+                time.sleep(2)  # only sleep on network errors, not quota errors
+                continue
 
     raise RuntimeError(f"All Gemini API keys and models exhausted. Last error: {last_error}")
