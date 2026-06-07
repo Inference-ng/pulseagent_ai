@@ -20,46 +20,27 @@ _FAISS_STORE = _FAISSStore()
 # ── LLM helper ───────────────────────────────────────────────────────────────
 
 def _call_gemini(system_prompt: str, user_message: str) -> dict:
-    import time
-    from google import genai
-    from google.genai import types
+    import httpx
 
-    client = genai.Client(api_key=GOOGLE_API_KEY)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GOOGLE_API_KEY}"
 
-    # Only free-tier flash models — Pro models have 0 quota on free plans
-    models = ["gemini-2.5-flash"]
-    max_retries = 3
-    last_err = None
+    payload = {
+        "system_instruction": {"parts": [{"text": system_prompt}]},
+        "contents": [{"parts": [{"text": user_message}]}],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.0
+        }
+    }
 
-    for model_name in models:
-        for attempt in range(max_retries):
-            try:
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=user_message,
-                    config=types.GenerateContentConfig(
-                        system_instruction=system_prompt,
-                        temperature=0.0,
-                        response_mime_type="application/json",
-                    ),
-                )
-                text = response.text.strip()
-                text = re.sub(r"^```(?:json)?\s*", "", text)
-                text = re.sub(r"\s*```$", "", text)
-                return json.loads(text)
-            except Exception as e:
-                last_err = e
-                err_str = str(e)
-                # Retry on rate limit (429) with exponential backoff
-                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                    wait = (2 ** attempt) * 5  # 5s, 10s, 20s
-                    time.sleep(wait)
-                    continue
-                # Non-rate-limit error — skip to next model
-                break
+    response = httpx.post(url, json=payload, timeout=60)
+    response.raise_for_status()
 
-    raise RuntimeError(f"All Gemini models failed: {last_err}")
-
+    data = response.json()
+    text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    text = re.sub(r"^```(?:json)?\s*", "", text)
+    text = re.sub(r"\s*```$", "", text)
+    return json.loads(text)
 # ── State ────────────────────────────────────────────────────────────────────
 
 class RecoAgentState(TypedDict):
