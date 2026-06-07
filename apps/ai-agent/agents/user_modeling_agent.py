@@ -16,29 +16,43 @@ from prompts.nigerian_context import get_context_for_persona
 # ── LLM helper ───────────────────────────────────────────────────────────────
 
 def _call_gemini(system_prompt: str, user_message: str) -> dict:
+    import time
     from google import genai
     from google.genai import types
 
     client = genai.Client(api_key=GOOGLE_API_KEY)
 
-    for model_name in ["gemini-2.5-flash", "gemini-2.5-pro"]:
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=user_message,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    temperature=0.7,
-                    response_mime_type="application/json",
-                ),
-            )
-            text = response.text.strip()
-            text = re.sub(r"^```(?:json)?\s*", "", text)
-            text = re.sub(r"\s*```$", "", text)
-            return json.loads(text)
-        except Exception as e:
-            last_err = e
-            continue
+    # Only free-tier flash models — Pro models have 0 quota on free plans
+    models = ["gemini-2.5-flash"]
+    max_retries = 3
+    last_err = None
+
+    for model_name in models:
+        for attempt in range(max_retries):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=user_message,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_prompt,
+                        temperature=0.7,
+                        response_mime_type="application/json",
+                    ),
+                )
+                text = response.text.strip()
+                text = re.sub(r"^```(?:json)?\s*", "", text)
+                text = re.sub(r"\s*```$", "", text)
+                return json.loads(text)
+            except Exception as e:
+                last_err = e
+                err_str = str(e)
+                # Retry on rate limit (429) with exponential backoff
+                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                    wait = (2 ** attempt) * 5  # 5s, 10s, 20s
+                    time.sleep(wait)
+                    continue
+                # Non-rate-limit error — skip to next model
+                break
 
     raise RuntimeError(f"All Gemini models failed: {last_err}")
 
