@@ -48,22 +48,25 @@ def get_context_for_persona(user_persona: dict) -> str:
     """Select the most appropriate Nigerian persona context based on user signals."""
     price_sensitivity = user_persona.get("price_sensitivity", "medium")
     categories = [c.lower() for c in user_persona.get("preferred_categories", [])]
-    user_id = user_persona.get("user_id", "").lower()
-    context = user_persona.get("context", "").lower() if user_persona.get("context") else ""
 
-    # Diaspora signals
-    if any(w in context for w in ["uk", "london", "abroad", "diaspora"]):
+    # Combine context and location into one signal string for detection
+    context  = (user_persona.get("context",  "") or "").lower()
+    location = (user_persona.get("location", "") or "").lower()
+    combined = context + " " + location
+
+    # Diaspora signals — check both context and location fields
+    if any(w in combined for w in ["uk", "london", "abroad", "diaspora", "europe", "usa", "canada", "america"]):
         archetype = PERSONA_CONTEXTS["diaspora"]
-    # Food/restaurant signals → Lagos foodie
-    elif any(c in categories for c in ["food", "restaurants", "dining"]):
+    # Food/restaurant signals → Lagos Foodie
+    elif any(c in categories for c in ["food", "restaurants", "dining", "restaurant"]):
         archetype = PERSONA_CONTEXTS["lagos_foodie"]
-    # Low price sensitivity → Abuja professional
+    # Low price sensitivity → Abuja Professional
     elif price_sensitivity == "low":
         archetype = PERSONA_CONTEXTS["abuja_professional"]
-    # High price sensitivity → Ibadan student
+    # High price sensitivity → Ibadan Student
     elif price_sensitivity == "high":
         archetype = PERSONA_CONTEXTS["ibadan_student"]
-    # Default → Port Harcourt businesswoman
+    # Default → Port Harcourt Businesswoman
     else:
         archetype = PERSONA_CONTEXTS["ph_businesswoman"]
 

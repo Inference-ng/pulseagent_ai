@@ -45,7 +45,7 @@ class FAISSStore:
             from sentence_transformers import SentenceTransformer
             if os.path.exists(self.index_path):
                 self.index = faiss.read_index(self.index_path)
-                self.model = SentenceTransformer("paraphrase-MiniLM-L3-v2")
+                self.model = SentenceTransformer("all-MiniLM-L6-v2")
                 self._use_neural = True
         except Exception:
             self._use_neural = False

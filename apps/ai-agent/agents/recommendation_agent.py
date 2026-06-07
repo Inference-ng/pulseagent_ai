@@ -192,6 +192,13 @@ def rank(state: RecoAgentState) -> RecoAgentState:
         }
         return state
 
+    # ── Nigerian Contextualisation Layer ──────────────────────────────────────
+    # Shared architectural component — same as Task A.
+    # Prepended (not appended) so the LLM weights it heavily.
+    from prompts.nigerian_context import get_context_for_persona
+    nigerian_ctx = get_context_for_persona(persona)
+    # ──────────────────────────────────────────────────────────────────────────
+
     # Format candidates for LLM
     candidates_str = ""
     for i, c in enumerate(candidates[:20], 1):
@@ -200,18 +207,21 @@ def rank(state: RecoAgentState) -> RecoAgentState:
         candidates_str += (
             f"{i}. Name: {c.get('name', 'Unknown')}, "
             f"Category: {c.get('category', 'N/A')}, "
-            f"Price: ₦{c.get('price', 0)}, "
+            f"Price: \u20a6{c.get('price', 0)}, "
             f"Brand: {c.get('brand', 'N/A')}"
             f"{stars_info}{reviews_info}\n"
         )
 
     confidence_note = "Since this is a cold-start user, assign confidence scores between 0.3 and 0.6." if is_cold_start else "Assign confidence scores between 0.6 and 0.95 based on persona fit."
 
-    system_prompt = f"""You are a product recommendation engine for a Nigerian e-commerce platform.
+    system_prompt = f"""{nigerian_ctx}
+
+You are a product recommendation engine for a Nigerian e-commerce platform.
 Given a user persona and candidate products, select and rank the top {top_k} most relevant items.
 {confidence_note}
 Include one cross-domain suggestion if the user's history is domain-specific.
 Consider the product's star rating and review count as quality signals when available.
+Write each recommendation reason in authentic Nigerian voice — use the tone and expressions from the persona context above naturally.
 
 IMPORTANT: Respond ONLY with valid JSON — no markdown, no code fences:
 {{
@@ -221,7 +231,7 @@ IMPORTANT: Respond ONLY with valid JSON — no markdown, no code fences:
       "item_name": "<string>",
       "category": "<string>",
       "score": <float 0.0-1.0>,
-      "reason": "<one sentence reason>"
+      "reason": "<one sentence reason in Nigerian voice>"
     }}
   ],
   "is_cold_start": <true|false>,
