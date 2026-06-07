@@ -22,6 +22,9 @@ class FAISSStore:
     """
 
     def __init__(self, index_path: str = None, metadata_path: str = None):
+        # Skip neural mode in memory-constrained environments (Render free tier = 512MB)
+        self._skip_neural = os.environ.get("DISABLE_NEURAL_SEARCH", "").lower() in ("1", "true", "yes")
+
         base_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "../../../data/processed")
         )
@@ -37,7 +40,8 @@ class FAISSStore:
         self._tfidf_svd = None        # sklearn TruncatedSVD     (tfidf mode)
 
         self._load_metadata()
-        self._try_load_neural()
+        if not self._skip_neural:
+            self._try_load_neural()
         if self._mode == "keyword":
             self._try_load_tfidf()
 

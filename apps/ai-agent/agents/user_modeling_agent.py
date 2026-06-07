@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
+if not GOOGLE_API_KEY:
+    import warnings
+    warnings.warn("GOOGLE_API_KEY not set — Gemini calls will fail!", stacklevel=2)
 
 from langgraph.graph import StateGraph, END
 from prompts.task_a_prompt import TASK_A_HUMAN_PROMPT, TASK_A_BASE_PROMPT
@@ -19,7 +22,7 @@ def _call_gemini(system_prompt: str, user_message: str) -> dict:
     models = ["gemini-2.0-flash-lite", "gemini-2.0-flash"]
 
     for model_name in models:
-        for attempt in range(3):
+        for attempt in range(2):
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GOOGLE_API_KEY}"
             payload = {
                 "system_instruction": {"parts": [{"text": system_prompt}]},
@@ -30,9 +33,9 @@ def _call_gemini(system_prompt: str, user_message: str) -> dict:
                 }
             }
             try:
-                response = httpx.post(url, json=payload, timeout=60)
+                response = httpx.post(url, json=payload, timeout=30)
                 if response.status_code == 429:
-                    time.sleep((attempt + 1) * 10)
+                    time.sleep((attempt + 1) * 3)
                     continue
                 response.raise_for_status()
                 data = response.json()

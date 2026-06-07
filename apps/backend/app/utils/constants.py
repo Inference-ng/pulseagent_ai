@@ -10,5 +10,5 @@ PRICE_SENSITIVITY = ["low", "medium", "high"]
 MIN_RATING = 1.0
 MAX_RATING = 5.0
 
-# API timeouts (in seconds)
-AGENT_TIMEOUT = 150
+# API timeouts (in seconds) — must be less than frontend timeout (180s)
+AGENT_TIMEOUT = 120
