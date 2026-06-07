@@ -51,8 +51,9 @@ app.include_router(simulate.router)
 app.include_router(recommend.router)
 
 
-# Root endpoint
+# Root endpoint — supports both GET and HEAD (Render health checks use HEAD)
 @app.get("/", tags=["root"])
+@app.head("/", tags=["root"])
 async def root():
     """Root endpoint — verify API is running"""
     return {
