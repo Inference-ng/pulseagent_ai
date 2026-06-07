@@ -1,6 +1,8 @@
 import os
 import re
 import json
+import time
+import httpx
 from typing import TypedDict
 from dotenv import load_dotenv
 
@@ -13,31 +15,36 @@ from prompts.task_a_prompt import TASK_A_HUMAN_PROMPT, TASK_A_BASE_PROMPT
 from prompts.nigerian_context import get_context_for_persona
 
 
-# ── LLM helper ───────────────────────────────────────────────────────────────
-
 def _call_gemini(system_prompt: str, user_message: str) -> dict:
-    import httpx
+    models = ["gemini-2.0-flash-lite", "gemini-2.0-flash"]
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GOOGLE_API_KEY}"
+    for model_name in models:
+        for attempt in range(3):
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GOOGLE_API_KEY}"
+            payload = {
+                "system_instruction": {"parts": [{"text": system_prompt}]},
+                "contents": [{"parts": [{"text": user_message}]}],
+                "generationConfig": {
+                    "responseMimeType": "application/json",
+                    "temperature": 0.7
+                }
+            }
+            try:
+                response = httpx.post(url, json=payload, timeout=60)
+                if response.status_code == 429:
+                    time.sleep((attempt + 1) * 10)
+                    continue
+                response.raise_for_status()
+                data = response.json()
+                text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                text = re.sub(r"^```(?:json)?\s*", "", text)
+                text = re.sub(r"\s*```$", "", text)
+                return json.loads(text)
+            except Exception:
+                continue
 
-    payload = {
-        "system_instruction": {"parts": [{"text": system_prompt}]},
-        "contents": [{"parts": [{"text": user_message}]}],
-        "generationConfig": {
-            "responseMimeType": "application/json",
-            "temperature": 0.7
-        }
-    }
+    raise RuntimeError("All Gemini models failed: check server logs for details")
 
-    response = httpx.post(url, json=payload, timeout=60)
-    response.raise_for_status()
-
-    data = response.json()
-    text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    text = re.sub(r"^```(?:json)?\s*", "", text)
-    text = re.sub(r"\s*```$", "", text)
-    return json.loads(text)
-# ── State ────────────────────────────────────────────────────────────────────
 
 class AgentState(TypedDict):
     user_persona: dict
@@ -47,10 +54,7 @@ class AgentState(TypedDict):
     errors: list
 
 
-# ── Nodes ────────────────────────────────────────────────────────────────────
-
 def retrieve(state: AgentState) -> AgentState:
-    """Pull user's past purchase history as context."""
     persona = state["user_persona"]
     history = persona.get("purchase_history", [])
     if persona.get("is_cold_start", False) or not history:
@@ -61,7 +65,6 @@ def retrieve(state: AgentState) -> AgentState:
 
 
 def contextualize(state: AgentState) -> AgentState:
-    """Build a rich NL context string based on persona and history."""
     persona = state["user_persona"]
     history_ctx = state.get("history_context", "")
     price_sens = persona.get("price_sensitivity", "medium")
@@ -81,7 +84,6 @@ def contextualize(state: AgentState) -> AgentState:
 
 
 def generate(state: AgentState) -> AgentState:
-    """Call Gemini LLM to produce rating + review."""
     persona = state["user_persona"]
     product = state["product"]
 
@@ -112,7 +114,6 @@ IMPORTANT: Respond ONLY with valid JSON in this exact format (no markdown, no co
 
     try:
         result = _call_gemini(system_prompt, user_message)
-        # Ensure all required keys exist
         for key in ["predicted_rating", "simulated_review", "confidence", "reasoning"]:
             if key not in result:
                 raise ValueError(f"Missing key in LLM response: {key}")
@@ -133,7 +134,6 @@ IMPORTANT: Respond ONLY with valid JSON in this exact format (no markdown, no co
 
 
 def validate(state: AgentState) -> AgentState:
-    """Ensure rating is within 1-5 range and review has substance."""
     res = state.get("review_result", {})
     rating = res.get("predicted_rating", 3.0)
     try:
@@ -151,8 +151,6 @@ def validate(state: AgentState) -> AgentState:
     return state
 
 
-# ── Graph ────────────────────────────────────────────────────────────────────
-
 workflow = StateGraph(AgentState)
 workflow.add_node("retrieve", retrieve)
 workflow.add_node("contextualize", contextualize)
@@ -169,10 +167,6 @@ app = workflow.compile()
 
 
 def simulate_review(user_persona: dict, product: dict) -> dict:
-    """
-    Task A entry point.
-    Returns dict with keys: predicted_rating, simulated_review, confidence, reasoning
-    """
     initial_state: AgentState = {
         "user_persona": user_persona,
         "product": product,
