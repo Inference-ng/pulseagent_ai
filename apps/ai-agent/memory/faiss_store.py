@@ -1,110 +1,157 @@
-import faiss
 import pickle
 import os
 import logging
-
-# ── Windows Terminal Fix + Offline Mode ───────────────────────────────────────
-# sentence_transformers prints Unicode progress bars (████) during model load.
-# On Windows with cp1252 terminals this causes a silent UnicodeEncodeError crash.
-# These env vars must be set BEFORE importing sentence_transformers.
-os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"   # disables tqdm HF bars
-os.environ["TRANSFORMERS_VERBOSITY"] = "error"       # silences transformers logs
-os.environ["TOKENIZERS_PARALLELISM"] = "false"       # prevents tokenizer warnings
-os.environ["TRANSFORMERS_OFFLINE"] = "1"             # use cached model — no network
-os.environ["HF_DATASETS_OFFLINE"] = "1"              # no dataset network calls
-# ─────────────────────────────────────────────────────────────────────────────
-
+import numpy as np
 
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
-logging.getLogger("transformers").setLevel(logging.ERROR)
 
-# ── HuggingFace Auth Fix ──────────────────────────────────────────────────────
-# sentence-transformers uses huggingface_hub internally. If any token is cached
-# on this machine (even an expired one) it will try to authenticate and return
-# a 401 Unauthorized error for public models.
-# We patch get_token() to always return None, forcing anonymous (public) access.
-import huggingface_hub
-huggingface_hub.get_token = lambda *args, **kwargs: None
-
-# Also clear any token env vars just in case
-for _var in ("HF_TOKEN", "HUGGING_FACE_HUB_TOKEN", "HUGGINGFACE_HUB_TOKEN"):
-    os.environ.pop(_var, None)
-# ─────────────────────────────────────────────────────────────────────────────
-
-from sentence_transformers import SentenceTransformer
 from typing import List, Dict, Any
 
 
 class FAISSStore:
     """
-    FAISS-backed vector store for semantic product retrieval (Task B).
-    Uses the all-MiniLM-L6-v2 sentence embedding model (384 dimensions).
-    Loads a pre-built index from data/processed/ if available;
-    otherwise initialises an empty index that can be populated with add_items().
+    Production-safe vector store.
+
+    Priority:
+      1. Neural search: FAISS IndexFlatIP + sentence-transformers (all-MiniLM-L6-v2)
+         — used when the model is cached locally.
+      2. TF-IDF + SVD search: FAISS IndexFlatIP + sklearn TfidfVectorizer/TruncatedSVD
+         — used when sentence-transformers is unavailable (Render free tier, etc.)
+      3. Keyword fallback: pure Python scoring, no FAISS required.
     """
 
     def __init__(self, index_path: str = None, metadata_path: str = None):
-        # Resolve data/processed/ relative to this file's location
         base_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "../../../data/processed")
         )
-        self.index_path = index_path or os.path.join(base_dir, "items.index")
+        self.index_path    = index_path    or os.path.join(base_dir, "items.index")
         self.metadata_path = metadata_path or os.path.join(base_dir, "items_metadata.pkl")
+        self.tfidf_path    = os.path.join(base_dir, "tfidf_model.pkl")
 
-        # Load the public embedding model (no auth needed)
-        self.model = SentenceTransformer("all-MiniLM-L6-v2")
-        self.index = None
         self.metadata: Dict[int, dict] = {}
+        self._mode      = "keyword"   # "neural" | "tfidf" | "keyword"
+        self.model      = None        # sentence-transformers model (neural mode)
+        self.index      = None        # faiss index
+        self._tfidf_vec = None        # sklearn TfidfVectorizer (tfidf mode)
+        self._tfidf_svd = None        # sklearn TruncatedSVD     (tfidf mode)
 
-        self.load()
+        self._load_metadata()
+        self._try_load_neural()
+        if self._mode == "keyword":
+            self._try_load_tfidf()
 
-    def load(self):
-        """Load pre-built FAISS index and metadata from disk, or initialise empty."""
-        if os.path.exists(self.index_path) and os.path.exists(self.metadata_path):
-            self.index = faiss.read_index(self.index_path)
+    # ── loaders ──────────────────────────────────────────────────────────────
+
+    def _load_metadata(self):
+        if os.path.exists(self.metadata_path):
             with open(self.metadata_path, "rb") as f:
                 self.metadata = pickle.load(f)
-        else:
-            # Empty flat L2 index (384 = all-MiniLM-L6-v2 embedding size)
-            self.index = faiss.IndexFlatL2(384)
-            self.metadata = {}
+            for v in self.metadata.values():
+                if isinstance(v.get("category"), str):
+                    v["category"] = v["category"].strip().title()
+
+    def _try_load_neural(self):
+        try:
+            import faiss
+            from sentence_transformers import SentenceTransformer
+            if os.path.exists(self.index_path):
+                self.index = faiss.read_index(self.index_path)
+                self.model = SentenceTransformer("all-MiniLM-L6-v2")
+                self._mode = "neural"
+        except Exception:
+            pass
+
+    def _try_load_tfidf(self):
+        """Load the TF-IDF + SVD model that ships in the repo (data/processed/tfidf_model.pkl)."""
+        try:
+            import faiss
+            if not os.path.exists(self.tfidf_path) or not os.path.exists(self.index_path):
+                return
+            with open(self.tfidf_path, "rb") as f:
+                bundle = pickle.load(f)
+            self._tfidf_vec = bundle["vectorizer"]
+            self._tfidf_svd = bundle["svd"]
+            self.index = faiss.read_index(self.index_path)
+            self._mode = "tfidf"
+        except Exception:
+            pass
+
+    # ── encoding ─────────────────────────────────────────────────────────────
+
+    def _encode(self, text: str) -> np.ndarray:
+        """Encode a query string into a 384-dim float32 vector."""
+        if self._mode == "neural":
+            vec = self.model.encode([text], convert_to_numpy=True).astype(np.float32)
+        else:  # tfidf
+            X = self._tfidf_vec.transform([text])
+            vec = self._tfidf_svd.transform(X).astype(np.float32)
+        # L2-normalise so IndexFlatIP == cosine similarity
+        norm = np.linalg.norm(vec)
+        if norm > 0:
+            vec = vec / norm
+        return vec
+
+    # ── keyword fallback ─────────────────────────────────────────────────────
+
+    def _keyword_search(self, query: str, k: int) -> List[Dict[str, Any]]:
+        STOP = {'i','a','the','for','and','or','in','on','at','to','of',
+                'is','it','me','my','want','need','looking','something','get','buy'}
+        query_words = set(query.lower().split()) - STOP
+
+        scored = []
+        for item in self.metadata.values():
+            text = f"{item.get('name','')} {item.get('description','')} {item.get('category','')}".lower()
+            score = sum(1 for w in query_words if w in text)
+            stars = float(item.get("stars", 3.0) or 3.0)
+            scored.append((score + stars / 10.0, item))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        top_score = scored[0][0] if scored else 0
+        if top_score <= 0.3:
+            return sorted(self.metadata.values(),
+                          key=lambda x: float(x.get("stars", 0) or 0),
+                          reverse=True)[:k]
+        return [item for _, item in scored[:k]]
+
+    # ── public API ───────────────────────────────────────────────────────────
+
+    def search(self, query: str, k: int = 10) -> List[Dict[str, Any]]:
+        if not self.metadata:
+            return []
+
+        if self._mode in ("neural", "tfidf") and self.index is not None:
+            try:
+                vec = self._encode(query)
+                distances, indices = self.index.search(vec, min(k, self.index.ntotal))
+                results = []
+                for i, idx in enumerate(indices[0]):
+                    if idx != -1 and idx in self.metadata:
+                        item = self.metadata[idx].copy()
+                        item["_score"] = float(distances[0][i])
+                        results.append(item)
+                return results
+            except Exception:
+                pass  # fall through to keyword
+
+        return self._keyword_search(query, k)
+
+    def add_items(self, items: List[Dict[str, Any]]):
+        if not items or self._mode == "keyword":
+            return
+        texts = [f"{i.get('name','')} {i.get('description','')} {i.get('category','')}"
+                 for i in items]
+        start_id = len(self.metadata)
+        for j, item in enumerate(items):
+            self.metadata[start_id + j] = item
+        embeddings = np.vstack([self._encode(t) for t in texts])
+        self.index.add(embeddings)
 
     def save(self):
-        """Persist the FAISS index and metadata to disk."""
+        if self._mode == "keyword":
+            return
+        import faiss
         os.makedirs(os.path.dirname(self.index_path), exist_ok=True)
         faiss.write_index(self.index, self.index_path)
         with open(self.metadata_path, "wb") as f:
             pickle.dump(self.metadata, f)
-
-    def add_items(self, items: List[Dict[str, Any]]):
-        """Embed and add a list of product dicts to the index, then save."""
-        if not items:
-            return
-        texts = [
-            f"{item.get('name', '')} {item.get('description', '')}"
-            for item in items
-        ]
-        embeddings = self.model.encode(texts)
-        start_id = len(self.metadata)
-        for i, item in enumerate(items):
-            self.metadata[start_id + i] = item
-        self.index.add(embeddings)
-        self.save()
-
-    def search(self, query: str, k: int = 10) -> List[Dict[str, Any]]:
-        """
-        Semantic search: returns the top-k most relevant items for a query.
-        Returns an empty list if the index has no items yet.
-        """
-        if self.index is None or self.index.ntotal == 0:
-            return []
-        query_embedding = self.model.encode([query])
-        distances, indices = self.index.search(query_embedding, k)
-        results = []
-        for i, idx in enumerate(indices[0]):
-            if idx != -1 and idx in self.metadata:
-                item = self.metadata[idx].copy()
-                item["_distance"] = float(distances[0][i])
-                results.append(item)
-        return results

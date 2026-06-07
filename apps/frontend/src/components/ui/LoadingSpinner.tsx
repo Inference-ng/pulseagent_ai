@@ -1,12 +1,10 @@
-interface LoadingSpinnerProps {
-  message?: string;
-}
+interface LoadingSpinnerProps { message?: string; }
 
-export function LoadingSpinner({ message = 'Thinking through the response...' }: LoadingSpinnerProps) {
+export function LoadingSpinner({ message }: LoadingSpinnerProps) {
   return (
-    <span className="inline-flex items-center gap-3 text-sm font-medium text-ink">
-      <span className="h-5 w-5 animate-spin rounded-full border-2 border-emerald/30 border-t-emerald" />
-      {message}
+    <span className="inline-flex items-center gap-2.5">
+      <span className="spinner" />
+      {message && <span className="text-sm font-medium text-ink">{message}</span>}
     </span>
   );
 }

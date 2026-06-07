@@ -50,7 +50,7 @@ async def recommend(
         # Call agent with timeout
         try:
             result = await asyncio.wait_for(
-                run_task_b(req.user_persona, req.top_k, req.domain, req.context_query),
+                run_task_b(req.user_persona.model_dump(), req.top_k, req.domain, req.context_query),
                 timeout=AGENT_TIMEOUT,
             )
         except asyncio.TimeoutError:
@@ -87,7 +87,7 @@ async def recommend(
         # Log to database in background
         background_tasks.add_task(
             log_recommendation,
-            req.user_persona.get("user_id", "unknown"),
+            req.user_persona.user_id,
             result.get("recommendations", []),
             req.domain,
             result.get("is_cold_start", False),

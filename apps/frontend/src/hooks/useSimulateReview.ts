@@ -1,33 +1,29 @@
 import { useState } from 'react';
-import { simulateReview } from '../lib/api';
+import { simulateReview, extractErrorMessage } from '../lib/api';
 import type { SimulateReviewRequest, SimulateReviewResponse } from '../types';
 
 export function useSimulateReview() {
-  const [data, setData] = useState<SimulateReviewResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData]         = useState<SimulateReviewResponse | null>(null);
+  const [error, setError]       = useState<string | null>(null);
+  const [isLoading, setLoading] = useState(false);
 
   const submit = async (payload: SimulateReviewRequest) => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
-
     try {
-      const response = await simulateReview(payload);
-      setData(response);
-      return response;
-    } catch (caughtError) {
-      const message = caughtError instanceof Error ? caughtError.message : 'Unable to simulate review';
-      setError(message);
-      throw caughtError;
+      const res = await simulateReview(payload);
+      setData(res);
+      return res;
+    } catch (err) {
+      const msg = extractErrorMessage(err);
+      setError(msg);
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  return {
-    data,
-    error,
-    isLoading,
-    submit,
-  };
+  const reset = () => { setData(null); setError(null); };
+
+  return { data, error, isLoading, submit, reset };
 }

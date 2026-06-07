@@ -8,11 +8,10 @@ class Settings(BaseSettings):
     """FastAPI Application Settings"""
 
     # Database
-    database_url: str = "postgresql://user:password@localhost/pulseagent_dev"
+    database_url: str = "file:./pulseagent.db"
 
     # API Keys & LLM
     google_api_key: str = ""
-    openai_api_key: str = ""
     ollama_base_url: str = "http://localhost:11434"
 
     # Application
@@ -23,7 +22,7 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
 
     # CORS
-    cors_origins: str = "http://localhost:3000,http://localhost:5173"
+    cors_origins: str = "http://localhost:3000,http://localhost:5173,https://pulseagent-ai.vercel.app"
 
     class Config:
         """Pydantic config"""

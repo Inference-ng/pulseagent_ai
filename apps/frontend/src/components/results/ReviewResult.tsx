@@ -1,61 +1,77 @@
-import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { Badge } from '../ui/Badge';
+import { motion } from 'framer-motion';
+import { ChevronDown, Quote } from 'lucide-react';
 import { StarRating } from '../ui/StarRating';
-import { ReasoningCard } from './ReasoningCard';
+import { Badge } from '../ui/Badge';
 import type { SimulateReviewResponse } from '../../types';
 
-interface ReviewResultProps {
-  result: SimulateReviewResponse;
+interface ReviewResultProps { result: SimulateReviewResponse; }
+
+function confidenceTone(c: number): 'emerald' | 'amber' | 'danger' {
+  if (c > 0.7) return 'emerald';
+  if (c >= 0.5) return 'amber';
+  return 'danger';
 }
 
 export function ReviewResult({ result }: ReviewResultProps) {
-  const tone = result.confidence > 0.7 ? 'emerald' : result.confidence >= 0.5 ? 'amber' : 'danger';
-  const [typedReview, setTypedReview] = useState('');
+  const [typed, setTyped] = useState('');
+  const tone = confidenceTone(result.confidence);
 
   useEffect(() => {
-    setTypedReview('');
-    let index = 0;
-
-    const timer = window.setInterval(() => {
-      index += 1;
-      setTypedReview(result.simulated_review.slice(0, index));
-
-      if (index >= result.simulated_review.length) {
-        window.clearInterval(timer);
-      }
-    }, 14);
-
-    return () => window.clearInterval(timer);
+    setTyped('');
+    let i = 0;
+    const t = setInterval(() => {
+      i += 2; // 2 chars per tick for speed
+      setTyped(result.simulated_review.slice(0, i));
+      if (i >= result.simulated_review.length) clearInterval(t);
+    }, 16);
+    return () => clearInterval(t);
   }, [result.simulated_review]);
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 18 }}
+      className="card animate-in"
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="panel-card"
+      transition={{ duration: 0.4 }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.28em] text-mist">Task A result</p>
-          <h3 className="mt-2 text-2xl font-semibold text-ink">Simulated review output</h3>
+          <p className="eyebrow">Task A — Result</p>
+          <h3 className="mt-1 text-lg font-bold text-ink">Simulated review</h3>
         </div>
         <Badge tone={tone}>{Math.round(result.confidence * 100)}% confident</Badge>
       </div>
 
-      <div className="mt-6 flex items-center gap-4">
-        <StarRating rating={result.predicted_rating} />
-        <p className="text-3xl font-semibold text-ink">{result.predicted_rating.toFixed(1)}</p>
+      <div className="divider my-4" />
+
+      {/* Rating */}
+      <div className="flex items-center gap-4">
+        <StarRating rating={result.predicted_rating} size="lg" />
+        <div>
+          <p className="text-3xl font-bold text-ink">{result.predicted_rating.toFixed(1)}</p>
+          <p className="text-xs text-mist">/ 5.0 predicted</p>
+        </div>
       </div>
 
-      <blockquote className="mt-6 rounded-[2rem] border border-amber/20 bg-amber/10 px-6 py-5 text-base leading-8 text-ink">
-        “{typedReview}”
-      </blockquote>
-
-      <div className="mt-6">
-        <ReasoningCard reasoning={result.reasoning} />
+      {/* Review text */}
+      <div className="relative mt-4 rounded-xl border border-amber/15 bg-amber/[0.06] px-5 py-4">
+        <Quote className="absolute left-3 top-3 h-4 w-4 text-amber/40" />
+        <p className="text-sm leading-7 text-ink pl-4">
+          {typed}
+          <span className="inline-block h-4 w-0.5 bg-emerald align-middle animate-pulse ml-0.5" />
+        </p>
       </div>
+
+      {/* Reasoning accordion */}
+      <details className="group mt-4 rounded-xl border border-white/[0.06] bg-surface/40">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
+          <span className="text-xs font-semibold text-mist">Agent reasoning</span>
+          <ChevronDown className="h-4 w-4 text-mist transition-transform group-open:rotate-180" />
+        </summary>
+        <p className="border-t border-white/[0.06] px-4 py-3 text-xs leading-6 text-mist">{result.reasoning}</p>
+      </details>
     </motion.section>
   );
 }

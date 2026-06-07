@@ -8,6 +8,8 @@ class UserPersona(BaseModel):
     price_sensitivity: Literal["high", "medium", "low"]
     preferred_categories: List[str]
     is_cold_start: bool = False
+    context: Optional[str] = None   # free-text context e.g. "uk diaspora", "student in Ibadan"
+    location: Optional[str] = None  # explicit location e.g. "London", "Lagos", "Abuja"
 
 class Product(BaseModel):
     name: str
@@ -16,11 +18,6 @@ class Product(BaseModel):
     brand: str
     description: str = ""
 
-class ReviewResult(BaseModel):
-    predicted_rating: float
-    simulated_review: str
-    confidence: float
-    reasoning: str
 
 class RecommendationItem(BaseModel):
     item_id: str

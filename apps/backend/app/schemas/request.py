@@ -27,13 +27,13 @@ class ProductRequest(BaseModel):
 
 class SimulateReviewRequest(BaseModel):
     """Request for Task A: Simulate Review"""
-    user_persona: dict = Field(..., description="User persona data")
-    product: dict = Field(..., description="Product data")
+    user_persona: UserPersonaRequest = Field(..., description="User persona data")
+    product: ProductRequest = Field(..., description="Product data")
 
 
 class RecommendRequest(BaseModel):
     """Request for Task B: Get Recommendations"""
-    user_persona: dict = Field(..., description="User persona data")
+    user_persona: UserPersonaRequest = Field(..., description="User persona data")
     top_k: int = Field(10, ge=1, le=50, description="Number of recommendations")
     domain: str = Field("fashion", description="Product domain")
     context_query: Optional[str] = Field("", description="Conversational query for recommendations")

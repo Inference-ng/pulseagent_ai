@@ -7,6 +7,7 @@
 
 ---
 
+
 ## 🎯 What We Built
 
 **PulseAgent AI** is an intelligent customer agent that:
@@ -171,7 +172,7 @@ services:
 | Layer | Technology |
 |---|---|
 | AI Agent | LangChain, LangGraph, FAISS |
-| LLM | Llama 3 (via Ollama) / GPT-4o-mini |
+| LLM | Gemini 2.5 Flash (google-genai) |
 | Backend | FastAPI, Python 3.11, SQLAlchemy |
 | Database | PostgreSQL |
 | Frontend | React 18, Vite, TailwindCSS |

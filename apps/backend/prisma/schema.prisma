@@ -1,5 +1,5 @@
 // PulseAgent AI — Prisma Schema (Phase 2)
-// Database: Neon PostgreSQL (serverless)
+// Database: SQLite (local)
 
 datasource db {
   provider = "sqlite"
@@ -19,7 +19,7 @@ model User {
   id            String   @id @default(cuid())
   user_id       String   @unique
   name          String?
-  metadata      Json?
+  metadata      String?
   createdAt     DateTime @default(now())
   
   // Relations
@@ -37,12 +37,12 @@ model Simulation {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   productName     String
-  productData     Json     // Full product details
+  productData     String     // Full product details (JSON string)
   
   predictedRating Float    // 1-5
-  simulatedReview String   @db.Text
+  simulatedReview String
   confidence      Float    // 0-1
-  reasoning       String   @db.Text
+  reasoning       String
   
   createdAt       DateTime @default(now())
 
@@ -57,7 +57,7 @@ model Recommendation {
   userId            String
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  recommendationsJson Json   // Array of recommendation items
+  recommendationsJson String   // Array of recommendation items (JSON string)
   isColdStart       Boolean
   domain            String   // fashion, electronics, books, food
   

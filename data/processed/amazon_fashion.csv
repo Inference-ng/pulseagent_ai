@@ -1,0 +1,116 @@
+id,name,description,category,price,brand,stars,review_count
+f001,Nike Air Force 1 Low Sneakers,"Classic all-white leather sneaker. A Lagos street staple — no be lie, everybody get one.",Fashion,45000,Nike,4.7,98234
+f002,Adidas Originals Superstar Sneakers,Iconic shell-toe sneaker. Abuja professionals and campus guys both rock this.,Fashion,42000,Adidas,4.6,87432
+f003,Nike Air Max 270,Max Air heel unit for all-day comfort on Lagos concrete. Popular on Jumia.,Fashion,58000,Nike,4.5,65231
+f004,Adidas Ultraboost 22 Running Shoes,"Responsive Boost midsole, Primeknit upper. Best running shoe for morning jogs in VI.",Fashion,72000,Adidas,4.8,54321
+f005,Puma Suede Classic Sneakers,Iconic Puma suede in multiple colourways. E no go disappoint for casual wear.,Fashion,28000,Puma,4.4,43211
+f006,New Balance 574 Core Sneakers,"Heritage lifestyle sneaker with suede and mesh. Extremely comfortable, great for everyday.",Fashion,39000,New Balance,4.6,38762
+f007,Converse Chuck Taylor All Star High-Top,Iconic canvas high-top. Classic choice for students and creatives from Lagos to Ibadan.,Fashion,26000,Converse,4.5,124532
+f008,Reebok Classic Leather Sneakers,"Timeless Reebok leather sneaker. Durable for everyday Lagos life, easy to clean.",Fashion,32000,Reebok,4.3,29874
+f009,Fila Disruptor II Platform Sneakers,"Bold chunky sole, retro 90s style. Very trendy on Nigerian campuses right now.",Fashion,31000,Fila,4.2,18543
+f010,Vans Old Skool Skate Shoes,"Classic side-stripe canvas shoe. Great for casual wear, lasts long.",Fashion,24000,Vans,4.4,87654
+f011,Ankara Print Midi Dress,"Beautiful Ankara fabric midi dress. Made in Nigeria, perfect for owambe and church.",Fashion,8500,Adire Collections,4.7,2341
+f012,Agbada Senator Kaftan Set (Men),"Premium three-piece Agbada for men. Sharp for owambe, funerals and traditional events in Abuja.",Fashion,35000,Royal Threads,4.8,1872
+f013,Aso-Oke Gele and Wrapper Set,Hand-woven Aso-Oke for weddings. Yoruba traditional attire done right. Ships within Lagos.,Fashion,22000,Aso-Oke Royale,4.9,987
+f014,Lace Gown with Beadwork (Women),Elegant lace gown with bead detailing. Perfect for Nigerian weddings and naming ceremonies.,Fashion,18000,Aso-Oke Royale,4.6,1543
+f015,Buba and Sokoto Matching Set,"Classic Yoruba formal wear in rich Ankara. Owambe-ready, e go make you stand out.",Fashion,14000,Ankara House,4.7,2109
+f016,Adire Premium Tie-Dye Kimono Jacket,Hand-dyed Adire fabric kimono. Unique Lagos streetwear that screams Nigerian creativity.,Fashion,12000,Adire Collective,4.5,876
+f017,Senator Embroidered Kaftan (Men),Premium embroidered kaftan for high-society Lagos and Abuja events. Very sharp.,Fashion,28000,Prestige Menswear,4.8,1234
+f018,Zara Oversized Linen Shirt,"Lightweight linen shirt perfect for Lagos heat. Relaxed oversized cut, stylish and cool.",Fashion,22000,Zara,4.4,34521
+f019,H&M Slim-Fit Chino Trousers,"Classic chinos in khaki and navy. Office or casual, works anywhere in Abuja or Lagos.",Fashion,18500,H&M,4.3,28763
+f020,Tommy Hilfiger Classic Polo Shirt,Premium pique cotton polo. The go-to shirt for Nigerian corporate casual Fridays.,Fashion,35000,Tommy Hilfiger,4.5,45231
+f021,Lacoste L.12.12 Polo Shirt,"The iconic crocodile polo. Tried and tested, e never go out of style in Nigeria.",Fashion,48000,Lacoste,4.7,67432
+f022,Nike Dri-FIT Training T-Shirt,Moisture-wicking training shirt for Lagos gym warriors. Lightweight and breathable.,Fashion,15000,Nike,4.4,23456
+f023,Levi's 501 Original Fit Jeans,The original straight-fit denim. Works with sneakers or dress shoes for any Lagos occasion.,Fashion,38000,Levi's,4.6,98765
+f024,Zara Wide-Leg Palazzo Trousers,Flowy palazzo trousers that work for office and weekend. Lagos ladies love these.,Fashion,19000,Zara,4.4,15432
+f025,Adidas Track Jacket,Classic three-stripe zip-up. Campus staple from Unilag to UI. Comfortable every day.,Fashion,32000,Adidas,4.5,34521
+f026,Puma RS-X Sneakers,"Bold chunky-sole retro running sneaker. Very comfortable, e dey for Slot and Jumia.",Fashion,42000,Puma,4.4,18765
+f027,Ankara Print Kaftan (Women),"Premium Ankara kaftan for weddings. Traditional Yoruba wedding attire, available on Jumia.",Fashion,16000,Adire Collections,4.8,3421
+f028,Jordan Air Jordan 1 Retro High OG,"Legendary Nike Jordan basketball shoe. Hype is real, e dey sell fast on Jumia.",Fashion,95000,Jordan,4.9,234521
+f029,Timberland 6-Inch Premium Waterproof Boot,Classic work boot. Nigerian rainy season approved — your feet go stay dry.,Fashion,68000,Timberland,4.6,76543
+f030,New Balance 550 Sneakers,Heritage basketball silhouette in suede and leather. Very clean look for Lagos casual wear.,Fashion,45000,New Balance,4.6,38762
+f031,Iro and Buba Matching Set (Women),Traditional Yoruba Iro and Buba in premium Ankara. Perfect for owambe and naming ceremonies.,Fashion,19500,Ankara House,4.8,1654
+f032,Under Armour Charged Pursuit 3 Running Shoe,Lightweight running shoe with mesh upper. Great for Lekki morning jogs and gym sessions.,Fashion,42000,Under Armour,4.4,14532
+f033,Polo Ralph Lauren Classic Fit Shirt,Premium cotton Oxford shirt. Sharp for Abuja corporate events and Nigerian board meetings.,Fashion,52000,Ralph Lauren,4.6,28761
+f034,Ankara Cord Jacket (Men),Tailored Ankara cord jacket. Unique Nigerian fashion-forward look for creative professionals.,Fashion,21000,Adire Collective,4.7,987
+f035,Skechers D'Lites Chunky Sneakers,"Comfortable memory foam chunky sneaker. Great for long Lagos market days, e no go stress your feet.",Fashion,29000,Skechers,4.3,21345
+e001,Tecno Spark 20 Pro Smartphone,"6.78 inch FHD+ display, 256GB storage, 5000mAh battery. Top seller on Jumia Nigeria.",Electronics,145000,Tecno,4.4,18765
+e002,Infinix Note 30 Pro,"AMOLED display, 45W fast charging, 108MP main camera. Very popular among Nigerian youth.",Electronics,185000,Infinix,4.5,14532
+e003,Samsung Galaxy A55 5G,"Samsung mid-ranger with AMOLED display and fast charging. Order on Jumia, fast delivery.",Electronics,265000,Samsung,4.6,34521
+e004,Xiaomi Redmi Note 13 Pro 4G,"200MP OIS camera, 120Hz AMOLED display, 5100mAh battery. Camera king at this price.",Electronics,198000,Xiaomi,4.7,28763
+e005,itel P55 Plus Smartphone,Budget-friendly with huge 6000mAh battery and 6.6 inch screen. Great first phone choice.,Electronics,68000,itel,4.2,8765
+e006,Oraimo FreePods 4 TWS Earbuds,"True wireless earbuds with 32hr total playback, ENC noise cancellation. Best value on Jumia.",Electronics,12500,Oraimo,4.5,23456
+e007,Samsung Galaxy Buds FE,"Active noise cancellation, 6hr playtime plus 21hr with case. Premium Samsung sound.",Electronics,55000,Samsung,4.6,18765
+e008,JBL Flip 6 Portable Bluetooth Speaker,"Waterproof speaker with punchy bass. Perfect for owambe, beach trips and Lagos parties.",Electronics,62000,JBL,4.8,45231
+e009,Anker PowerCore 20000 Power Bank,"20,000mAh with 2 USB-A and USB-C. The ultimate NEPA solution for Nigerian households.",Electronics,28000,Anker,4.7,34521
+e010,Romoss Sense 8+ 30000mAh Power Bank,"Massive 30,000mAh PD fast charge. Survive any power outage in Lagos in style.",Electronics,22000,Romoss,4.5,12345
+e011,Hisense 43-inch FHD Smart TV,"Full HD Smart TV with Android OS, built-in Netflix and YouTube. Great living room buy.",Electronics,265000,Hisense,4.5,9876
+e012,Syinix 32-inch HD Smart TV,"HD Smart TV with Android, built-in WiFi, HDMI and USB. Affordable quality TV.",Electronics,115000,Syinix,4.3,7654
+e013,Oraimo 65W GaN Fast Charger,"Compact GaN charger for laptops and phones. No more slow charging, abeg.",Electronics,15000,Oraimo,4.6,11234
+e014,Xiaomi Redmi Pad SE Tablet,"90Hz display, 8000mAh battery, good for students and work. Ships same day on Jumia.",Electronics,165000,Xiaomi,4.5,8765
+e015,Sony WH-1000XM5 Headphones,Industry-leading noise cancellation. Best for long Lagos-Abuja flights and work from home.,Electronics,320000,Sony,4.9,87654
+e016,Tecno Camon 20 Pro 5G,5G smartphone with 64MP selfie camera and AMOLED display. Content creators' choice in Lagos.,Electronics,235000,Tecno,4.5,12345
+e017,Infinix Smart 8 Plus,Entry-level smartphone with big 5000mAh battery. Great student phone under 80k.,Electronics,72000,Infinix,4.2,9876
+e018,Oraimo Boom Box 3 Wireless Speaker,Loud wireless speaker with deep bass. Perfect for Nigerian parties and outdoor events.,Electronics,18500,Oraimo,4.4,7654
+e019,TP-Link Wi-Fi 6 Router,Fast Wi-Fi 6 router for homes and offices. Improves internet speed significantly.,Electronics,45000,TP-Link,4.5,5432
+e020,Samsung Galaxy A35 5G,Mid-range 5G Samsung with great camera and display. Popular upgrade for Nigerians.,Electronics,198000,Samsung,4.5,21345
+b001,Neutrogena Hydro Boost Water Gel Moisturiser,Lightweight hyaluronic acid gel for Lagos humidity. Keeps skin hydrated all day.,Beauty,14500,Neutrogena,4.7,234521
+b002,SheaMoisture African Black Soap Face Wash,"Natural black soap with shea butter. Great for acne-prone Nigerian skin, no harsh chemicals.",Beauty,8500,SheaMoisture,4.6,98765
+b003,Maybelline Fit Me Matte Foundation,Oil-free foundation with buildable coverage. Shades available for deep Nigerian skin tones.,Beauty,11000,Maybelline,4.5,187654
+b004,Nivea Nourishing Cocoa Body Lotion 400ml,Rich cocoa lotion with subtle glow finish. Deeply moisturises Nigerian skin. Na classic.,Beauty,4800,Nivea,4.6,45231
+b005,Cantu Shea Butter Leave-In Conditioning Cream,Leave-in conditioner with pure shea butter. Keeps 4C curls and coils moisturised perfectly.,Beauty,8800,Cantu,4.7,76543
+b006,ORS Olive Oil Replenishing Conditioner,Deep conditioning for relaxed and natural hair. Lagos ladies trust this for shine and moisture.,Beauty,7200,ORS,4.5,34521
+b007,Black Opal True Color Skin Perfecting Stick,Concealer for deeper complexions. Covers blemishes and evens Nigerian skin tone perfectly.,Beauty,9000,Black Opal,4.6,23456
+b008,Palmer's Cocoa Butter Formula Body Lotion,"Classic cocoa butter loved across Nigeria. E leave skin soft and glowing, no be lie.",Beauty,5500,Palmer's,4.7,87654
+b009,Revlon ColorStay Longwear Foundation SPF15,24-hour wear foundation that does not budge in Lagos heat or humidity. Great for events.,Beauty,12500,Revlon,4.5,45231
+b010,Dark and Lovely Rich Colour Hair Dye,"Long-lasting colour kit designed for natural African hair. Vibrant results, fade-resistant.",Beauty,5500,Dark and Lovely,4.4,18765
+b011,Olay Regenerist Micro-Sculpting Cream,Anti-aging moisturiser with hyaluronic acid. Popular among Abuja professional women.,Beauty,18000,Olay,4.6,34521
+b012,Fenty Beauty Pro Filt'r Foundation,40+ shades including deep Nigerian tones. The gold standard for inclusive coverage.,Beauty,25000,Fenty Beauty,4.8,123456
+b013,L'Oreal Paris True Match Foundation,"Wide shade range, good for Nigerian skin tones. Long-lasting formula for humid weather.",Beauty,9500,L'Oreal,4.4,56789
+b014,Dove Body Wash 500ml,Gentle moisturising body wash. Popular daily cleanser in Nigerian households.,Beauty,4200,Dove,4.5,43210
+b015,Garnier Micellar Cleansing Water,Gentle makeup remover that works fast. Great for Nigerian ladies before bed after owambe.,Beauty,6800,Garnier,4.5,34567
+bk001,Things Fall Apart — Chinua Achebe,Nigerian literary classic about Igbo culture and colonialism. Required reading. E never get old.,Books,4500,Heinemann,4.9,234521
+bk002,Purple Hibiscus — Chimamanda Ngozi Adichie,Award-winning debut novel. Deeply moving Nigerian coming-of-age story. E go move you to tears.,Books,7000,Algonquin,4.8,98765
+bk003,Half of a Yellow Sun — Chimamanda Adichie,Powerful novel set during the Nigeria-Biafra War. Emotionally gripping. A must-read.,Books,8000,Knopf,4.9,76543
+bk004,Atomic Habits — James Clear,"The number 1 self-improvement book worldwide. Build good habits, break bad ones. Must-read.",Books,8500,Avery,4.8,876543
+bk005,The Psychology of Money — Morgan Housel,19 timeless lessons on wealth and happiness. Essential finance read for every Nigerian hustler.,Books,9500,Harriman House,4.8,234521
+bk006,Rich Dad Poor Dad — Robert Kiyosaki,The personal finance book that changes how you think about money. Every Naija entrepreneur needs this.,Books,7500,Plata,4.7,345621
+bk007,The Alchemist — Paulo Coelho,"Inspirational fable about following your dreams. Na motivation in book form, e never get old.",Books,7000,HarperOne,4.7,234521
+bk008,Think and Grow Rich — Napoleon Hill,Classic mindset and success book. Widely read by Nigerian entrepreneurs since the 80s.,Books,6500,TarcherPerigee,4.6,187654
+bk009,The 48 Laws of Power — Robert Greene,48 laws from history's most powerful figures. Widely read in Lagos boardrooms and by hustlers.,Books,9000,Penguin,4.5,123456
+bk010,WAEC Past Questions and Answers (All Subjects),Comprehensive WAEC past questions with detailed solutions. Essential for every SS3 student.,Books,3500,Tonad,4.8,18765
+bk011,We Should All Be Feminists — Chimamanda Adichie,Short but powerful essay on gender equality. Widely assigned in Nigerian universities.,Books,4200,Anchor,4.8,87654
+bk012,Stay With Me — Ayobami Adebayo,"Powerful Nigerian novel about marriage, fertility and family. E go stay with you long after.",Books,6500,Canongate,4.7,23456
+bk013,Americanah — Chimamanda Ngozi Adichie,Bestselling novel about a Nigerian woman's journey across continents and identity. Brilliant writing.,Books,7800,Anchor,4.8,98765
+bk014,The Jungle — Upton Sinclair,Classic social justice novel. Great addition for history and literature lovers.,Books,5500,Penguin Classics,4.4,34521
+bk015,JAMB CBT Past Questions (5-Year Bundle),Comprehensive JAMB past questions for all subjects. Every JAMB candidate needs this.,Books,4500,Tonad,4.9,24567
+r001,Chicken Republic Mighty Meal Deal,2 pieces chicken plus large chips plus drink. Nigeria's most popular fast food combo.,Restaurants,6500,Chicken Republic,4.3,18765
+r002,Kilimanjaro Suya Platter for Two,"Signature suya platter with dipping sauces and fresh pepper slices. Abeg, the suya na fire.",Restaurants,14000,Kilimanjaro,4.6,12345
+r003,Sweet Sensation Jollof Rice and Chicken,Party-style jollof rice with grilled chicken. The ultimate Nigerian comfort meal. No be lie.,Restaurants,5500,Sweet Sensation,4.5,9876
+r004,Mr Biggs Meat Pie 6-pack,"Iconic Nigerian meat pie with flaky pastry and savoury filling. Pure nostalgia, sha.",Restaurants,4200,Mr Biggs,4.4,8765
+r005,Yellow Chilli Pepper Soup with Catfish,Spicy catfish pepper soup made to the original recipe by Sisi Yemi. A Lagos favourite.,Restaurants,9500,Yellow Chilli,4.7,7654
+r006,Tantalizers Egusi Soup and Eba Set Meal,Authentic egusi soup with smooth eba and assorted meat. Real Naija food done right.,Restaurants,5800,Tantalizers,4.5,11234
+r007,Ocean Basket Calamari and Fish and Chips,Crispy calamari with lemon aioli and generous fish and chips. Date-night approved in Lagos.,Restaurants,16500,Ocean Basket,4.6,8765
+r008,Nandos PERi-PERi Chicken Quarter Meal,Flame-grilled PERi-PERi chicken with two sides. Medium heat is the sweet spot for Nigerians.,Restaurants,8500,Nandos,4.6,12345
+r009,Dominos Pizza Nigerian Pepperoni Large,Large pepperoni pizza with extra cheese. Nigerian fans love this for movie nights in Lekki.,Restaurants,12500,Dominos,4.4,9876
+r010,Cold Stone Creamery Signature Creation,Made-to-order ice cream with mix-ins. Premium Lagos treat. Great for after owambe.,Restaurants,4500,Cold Stone,4.5,7654
+r011,The Place Restaurant Lekki Full Meal,"Best local Nigerian food in Lagos. Fast service, great jollof rice, e never disappoint.",Restaurants,5000,The Place,4.7,15432
+r012,Mega Chicken Family Combo Ikeja,"Huge portions of fried rice, chicken and pastries. Perfect for family outings in Lagos.",Restaurants,9500,Mega Chicken,4.5,11234
+r013,Shiro Restaurant Pan-Asian Dinner for Two,Premium Pan-Asian dining in Victoria Island. Great for special occasions and date nights.,Restaurants,45000,Shiro,4.7,5432
+r014,Barcelos Flame-Grilled Chicken Combo,Portuguese-style flame-grilled chicken. Great value meal across Lagos and Abuja outlets.,Restaurants,7500,Barcelos,4.5,8765
+r015,KFC Streetwise Two Meal Deal,Two pieces of Original Recipe chicken with chips and drink. Affordable fast food across Nigeria.,Restaurants,5500,KFC,4.3,21345
+fd001,Indomie Instant Noodles Chicken Flavour 40-pack,Nigeria's favourite instant noodle. Indomie go always save the day for students and bachelors.,Food,9500,Indomie,4.8,45231
+fd002,Golden Penny Semolina 5kg,"Smooth semolina for eba and swallow. Consistently high quality, e never disappoint.",Food,6500,Golden Penny,4.6,18765
+fd003,Milo Chocolate Malt Drink 900g,Chocolate energy drink beloved by Nigerian kids and adults. Classic morning breakfast staple.,Food,4800,Nestle,4.7,34521
+fd004,Peak Full Cream Milk Powder 900g,"Creamy full-fat milk powder for tea, pap and cooking. Nigerian household favourite.",Food,5200,Peak,4.6,23456
+fd005,Dangote White Sugar 50kg,Bulk refined white sugar. Trusted Nigerian brand for households and small businesses.,Food,68000,Dangote,4.7,8765
+fd006,Honeywell Semovita 5kg,"Semovita for smooth stretchy swallow. Pairs perfectly with egusi, okra or bitterleaf soup.",Food,6800,Honeywell,4.7,15432
+fd007,Titus Sardines in Tomato Sauce 125g x12,"Tasty sardines for bread, rice or noodles. Affordable protein source for Nigerian homes.",Food,7200,Titus,4.5,12345
+fd008,Knorr Chicken Seasoning Cubes 50-pack,The go-to seasoning in every Nigerian kitchen. E make everything taste like mama cooking.,Food,2500,Knorr,4.9,87654
+fd009,Sunola Vegetable Oil 5 litres,"Light cooking oil for frying, stewing and baking. Popular in Nigerian kitchens nationwide.",Food,9800,Sunola,4.5,18765
+fd010,Cadbury Bournvita Chocolate Drink 900g,Energy-boosting chocolate malt. Classic Nigerian school mornings in a tin. No be lie.,Food,4500,Cadbury,4.6,23456
+fd011,Golden Morn Maize Flakes Cereal 1kg,Nutritious maize-based cereal. Quick breakfast for Nigerian families on busy mornings.,Food,3800,Nestle,4.4,12345
+fd012,Mama's Choice Palm Oil 5 litres,Pure Nigerian red palm oil for soups and stews. Rich colour and authentic taste.,Food,7500,Mama's Choice,4.7,9876
+fd013,Tasty Tom Tomato Paste 70g x24,Concentrated tomato paste. The base of every Nigerian stew and jollof rice.,Food,4800,Tasty Tom,4.6,15432
+fd014,Cowbell Chocolate Powder 800g,Rich chocolate drink mix. Nigerian alternative to Milo — great value for families.,Food,3900,Cowbell,4.5,8765
+fd015,Dangote Macaroni 500g x20,"Smooth Nigerian macaroni pasta. Quick to cook, affordable, pairs well with stew.",Food,8500,Dangote,4.5,11234

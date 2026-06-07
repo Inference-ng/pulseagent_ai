@@ -1,52 +1,124 @@
 import { motion } from 'framer-motion';
+import { ScoreBar } from '../ui/ScoreBar';
 import { Badge } from '../ui/Badge';
+import { MessageSquare, Send } from 'lucide-react';
+import { useState } from 'react';
 import type { RecommendationResponse } from '../../types';
 
 interface RecommendationListProps {
-  result: RecommendationResponse;
+  result:       RecommendationResponse;
+  onFollowUp:   (q: string) => Promise<void>;
+  isFollowUpLoading: boolean;
 }
 
-export function RecommendationList({ result }: RecommendationListProps) {
-  const rankedItems = result.recommendations.slice(0, 10);
+const categoryColors: Record<string, 'emerald' | 'amber' | 'mist'> = {
+  fashion:     'emerald',
+  electronics: 'amber',
+  books:       'emerald',
+  food:        'amber',
+  beauty:      'emerald',
+  restaurants: 'amber',
+};
+
+export function RecommendationList({ result, onFollowUp, isFollowUpLoading }: RecommendationListProps) {
+  const [followUp, setFollowUp] = useState('');
+
+  const handleSend = async () => {
+    const q = followUp.trim();
+    if (!q) return;
+    await onFollowUp(q);
+    setFollowUp('');
+  };
+
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  };
+
+  const items = result.recommendations.slice(0, 10);
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 18 }}
+      className="card"
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="panel-card"
+      transition={{ duration: 0.4 }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.28em] text-mist">Task B result</p>
-          <h3 className="mt-2 text-2xl font-semibold text-ink">Top 10 ranked recommendations</h3>
+          <p className="eyebrow">Task B — Result</p>
+          <h3 className="mt-1 text-lg font-bold text-ink">
+            Top {items.length} recommendations
+          </h3>
         </div>
-        <Badge>{rankedItems.length} returned</Badge>
+        <div className="flex items-center gap-2">
+          {result.is_cold_start && <Badge tone="amber">Cold start</Badge>}
+          <Badge tone="mist">{result.total} returned</Badge>
+        </div>
       </div>
 
-      <div className="mt-6 space-y-4">
-        {rankedItems.map((item, index) => (
-          <article key={item.item_id} className="rounded-[2rem] border border-white/10 bg-white/5 p-5">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="inline-flex rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-mist">
-                  #{index + 1}
-                </p>
-                <h4 className="mt-2 text-lg font-semibold text-ink">{item.item_name}</h4>
-                <p className="mt-2 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium capitalize text-mist">
-                  {item.category}
-                </p>
+      <div className="divider my-4" />
+
+      {/* Recommendation items */}
+      <div className="space-y-3">
+        {items.map((item, idx) => (
+          <motion.article
+            key={item.item_id}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.04, duration: 0.3 }}
+            className="card-sm"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 min-w-0">
+                {/* Rank badge */}
+                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-surface text-xs font-bold text-mist border border-white/[0.08]">
+                  {idx + 1}
+                </span>
+                <div className="min-w-0">
+                  <h4 className="text-sm font-semibold text-ink truncate">{item.item_name}</h4>
+                  <span className={`badge ${categoryColors[item.category] === 'emerald' ? 'badge-emerald' : 'badge-amber'} mt-1 text-[10px] capitalize`}>
+                    {item.category}
+                  </span>
+                </div>
               </div>
-              <Badge tone="emerald">{Math.round(item.score * 100)} match</Badge>
+              <div className="flex-shrink-0 text-right">
+                <p className="text-sm font-bold text-ink">{Math.round(item.score * 100)}%</p>
+                <p className="text-[10px] text-mist">match</p>
+              </div>
             </div>
-
-            <div className="mt-4 h-2 rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-gradient-to-r from-emerald to-amber" style={{ width: `${Math.max(8, item.score * 100)}%` }} />
-            </div>
-
-            <p className="mt-4 text-sm italic leading-7 text-mist">{item.reason}</p>
-          </article>
+            <ScoreBar score={item.score} />
+            <p className="mt-2 text-xs leading-5 text-mist italic">{item.reason}</p>
+          </motion.article>
         ))}
+      </div>
+
+      {/* Follow-up conversation */}
+      <div className="mt-5 rounded-xl border border-white/[0.06] bg-surface/40 p-4">
+        <p className="eyebrow mb-3 flex items-center gap-1.5">
+          <MessageSquare className="h-3 w-3" />
+          Multi-turn — ask a follow-up
+        </p>
+        <div className="flex gap-2">
+          <input
+            className="field-input flex-1 py-2.5 text-xs"
+            placeholder="e.g. Show me options under ₦20,000 instead…"
+            value={followUp}
+            onChange={(e) => setFollowUp(e.target.value)}
+            onKeyDown={handleKey}
+          />
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={isFollowUpLoading || !followUp.trim()}
+            className="btn-primary btn-sm px-3.5"
+          >
+            {isFollowUpLoading
+              ? <span className="spinner h-3.5 w-3.5" />
+              : <Send className="h-3.5 w-3.5" />
+            }
+          </button>
+        </div>
       </div>
     </motion.section>
   );
