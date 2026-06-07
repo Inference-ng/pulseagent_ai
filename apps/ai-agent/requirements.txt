@@ -1,11 +1,24 @@
+# Core agent framework
 langgraph>=0.2.0,<0.3.0
 langchain-core>=0.2.0,<0.4.0
-langchain-google-genai>=1.0.5,<2.0.0
+
+# Gemini — use the native SDK directly (avoids region restriction issues in langchain-google-genai)
+google-genai>=1.0.0
+
+# Vector search
 faiss-cpu>=1.8.0
-sentence-transformers>=3.0.0
 numpy>=1.26,<2.0
-pydantic>=2.0
-datasets
-pandas
+
+# Sentence embeddings (optional — system falls back to TF-IDF if unavailable)
+sentence-transformers>=3.0.0
+
+# TF-IDF fallback (ships with scikit-learn)
+scikit-learn>=1.4.0
+
+# Data + utils
+pandas>=2.0
 python-dotenv
+pydantic>=2.0
+
+# Testing
 pytest

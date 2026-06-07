@@ -172,7 +172,7 @@ services:
 | Layer | Technology |
 |---|---|
 | AI Agent | LangChain, LangGraph, FAISS |
-| LLM | Llama 3 (via Ollama) / GPT-4o-mini |
+| LLM | Gemini 2.5 Flash (google-generativeai SDK) |
 | Backend | FastAPI, Python 3.11, SQLAlchemy |
 | Database | PostgreSQL |
 | Frontend | React 18, Vite, TailwindCSS |
