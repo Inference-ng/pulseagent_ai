@@ -1,13 +1,12 @@
 import os
-import re
-import json
-import time
-import httpx
+import logging
 import random
 from typing import TypedDict
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 if not GOOGLE_API_KEY:
@@ -16,38 +15,9 @@ if not GOOGLE_API_KEY:
 
 from langgraph.graph import StateGraph, END
 from memory.faiss_store import FAISSStore as _FAISSStore
+from utils.gemini_client import call_gemini  # ← shared client
+
 _FAISS_STORE = _FAISSStore()
-
-
-def _call_gemini(system_prompt: str, user_message: str) -> dict:
-    models = ["gemini-2.0-flash-lite", "gemini-2.0-flash"]
-
-    for model_name in models:
-        for attempt in range(2):
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GOOGLE_API_KEY}"
-            payload = {
-                "system_instruction": {"parts": [{"text": system_prompt}]},
-                "contents": [{"parts": [{"text": user_message}]}],
-                "generationConfig": {
-                    "responseMimeType": "application/json",
-                    "temperature": 0.0
-                }
-            }
-            try:
-                response = httpx.post(url, json=payload, timeout=30)
-                if response.status_code == 429:
-                    time.sleep((attempt + 1) * 3)
-                    continue
-                response.raise_for_status()
-                data = response.json()
-                text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-                text = re.sub(r"^```(?:json)?\s*", "", text)
-                text = re.sub(r"\s*```$", "", text)
-                return json.loads(text)
-            except Exception:
-                continue
-
-    raise RuntimeError("All Gemini models failed: check server logs for details")
 
 
 class RecoAgentState(TypedDict):
@@ -215,6 +185,9 @@ def rank(state: RecoAgentState) -> RecoAgentState:
         else "Assign confidence scores between 0.6 and 0.95 based on persona fit."
     )
 
+    # Sanitise context_query before injecting into prompt
+    safe_context_query = str(state.get("context_query", "") or "")[:300]
+
     system_prompt = f"""{nigerian_ctx}
 
 You are a product recommendation engine for a Nigerian e-commerce platform.
@@ -223,7 +196,7 @@ Given a user persona and candidate products, select and rank the top {top_k} mos
 Include one cross-domain suggestion if the user's history is domain-specific.
 Write each recommendation reason in authentic Nigerian voice — warm, direct, real.
 
-IMPORTANT: Respond ONLY with valid JSON — no markdown, no code fences:
+IMPORTANT: Respond ONLY with valid JSON — no markdown, no code fences, no extra text:
 {{
   "recommendations": [
     {{
@@ -245,7 +218,7 @@ IMPORTANT: Respond ONLY with valid JSON — no markdown, no code fences:
 - Purchase History: {', '.join(persona.get('purchase_history', [])) or 'None'}
 - Is Cold Start: {is_cold_start}
 
-Context Query: "{state.get('context_query', '')}"
+Context Query: "{safe_context_query}"
 Domain: {state['domain']}
 Top-K requested: {top_k}
 
@@ -255,13 +228,15 @@ Candidate Products:
 Return the top {top_k} ranked recommendations as JSON."""
 
     try:
-        result = _call_gemini(system_prompt, user_message)
+        result = call_gemini(system_prompt, user_message, temperature=0.0)
         if "recommendations" not in result:
             raise ValueError("Missing recommendations key")
         result["is_cold_start"] = is_cold_start
         result["total"] = len(result["recommendations"])
         state["final_result"] = result
+        logger.info("[TaskB] Success — %d recommendations returned", result["total"])
     except Exception as e:
+        logger.error("[TaskB] rank() Gemini call failed: %s", e)
         state["errors"].append(str(e))
         score_base = 0.4 if is_cold_start else 0.7
         items = []

@@ -1,12 +1,12 @@
 import os
 import re
-import json
-import time
-import httpx
+import logging
 from typing import TypedDict
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 if not GOOGLE_API_KEY:
@@ -16,37 +16,7 @@ if not GOOGLE_API_KEY:
 from langgraph.graph import StateGraph, END
 from prompts.task_a_prompt import TASK_A_HUMAN_PROMPT, TASK_A_BASE_PROMPT
 from prompts.nigerian_context import get_context_for_persona
-
-
-def _call_gemini(system_prompt: str, user_message: str) -> dict:
-    models = ["gemini-2.0-flash-lite", "gemini-2.0-flash"]
-
-    for model_name in models:
-        for attempt in range(2):
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GOOGLE_API_KEY}"
-            payload = {
-                "system_instruction": {"parts": [{"text": system_prompt}]},
-                "contents": [{"parts": [{"text": user_message}]}],
-                "generationConfig": {
-                    "responseMimeType": "application/json",
-                    "temperature": 0.7
-                }
-            }
-            try:
-                response = httpx.post(url, json=payload, timeout=30)
-                if response.status_code == 429:
-                    time.sleep((attempt + 1) * 3)
-                    continue
-                response.raise_for_status()
-                data = response.json()
-                text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-                text = re.sub(r"^```(?:json)?\s*", "", text)
-                text = re.sub(r"\s*```$", "", text)
-                return json.loads(text)
-            except Exception:
-                continue
-
-    raise RuntimeError("All Gemini models failed: check server logs for details")
+from utils.gemini_client import call_gemini  # ← shared client
 
 
 class AgentState(TypedDict):
@@ -93,13 +63,16 @@ def generate(state: AgentState) -> AgentState:
     nigerian_ctx = get_context_for_persona(persona)
     system_prompt = TASK_A_BASE_PROMPT.format(nigerian_context=nigerian_ctx) + """
 
-IMPORTANT: Respond ONLY with valid JSON in this exact format (no markdown, no code blocks):
+IMPORTANT: Respond ONLY with valid JSON — no markdown, no code fences, no extra text:
 {
   "predicted_rating": <float between 1.0 and 5.0>,
   "simulated_review": "<3-5 sentence review string>",
   "confidence": <float between 0.0 and 1.0>,
   "reasoning": "<brief explanation of rating and review choices>"
 }"""
+
+    # Sanitise user-controlled input before injecting into prompt
+    context_query = str(product.get("description", "") or "")[:500]
 
     user_message = TASK_A_HUMAN_PROMPT.format(
         user_id=persona.get("user_id", "unknown"),
@@ -112,16 +85,19 @@ IMPORTANT: Respond ONLY with valid JSON in this exact format (no markdown, no co
         product_category=product.get("category", ""),
         product_price=product.get("price", 0),
         product_brand=product.get("brand", ""),
-        product_description=product.get("description", ""),
+        product_description=context_query,
     )
 
     try:
-        result = _call_gemini(system_prompt, user_message)
+        result = call_gemini(system_prompt, user_message, temperature=0.7)
         for key in ["predicted_rating", "simulated_review", "confidence", "reasoning"]:
             if key not in result:
                 raise ValueError(f"Missing key in LLM response: {key}")
         state["review_result"] = result
+        logger.info("[TaskA] Success — rating=%.1f confidence=%.2f",
+                    result["predicted_rating"], result["confidence"])
     except Exception as e:
+        logger.error("[TaskA] generate() failed: %s", e)
         state["errors"].append(str(e))
         state["review_result"] = {
             "predicted_rating": persona.get("avg_rating_given") or 3.0,
