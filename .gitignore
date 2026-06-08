@@ -22,8 +22,8 @@ env/
 # ── Datasets (too large for git) ──────────────────
 data/raw/
 data/processed/*.csv
-data/processed/*.pkl
-data/processed/*.index
+# data/processed/*.pkl   — needed for Render deployment
+# data/processed/*.index — needed for Render deployment
 *.csv
 *.json.gz
 

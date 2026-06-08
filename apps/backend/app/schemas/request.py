@@ -14,6 +14,7 @@ class UserPersonaRequest(BaseModel):
     preferred_categories: List[str] = []
     is_cold_start: bool = False
     context: Optional[str] = None
+    location: Optional[str] = None  # e.g. "Lagos", "UK" — used for diaspora persona detection
 
 
 class ProductRequest(BaseModel):

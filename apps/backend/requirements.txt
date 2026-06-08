@@ -12,7 +12,8 @@ langchain-core>=0.2.0,<0.4.0
 google-genai>=1.0.0
 faiss-cpu>=1.8.0
 numpy>=1.26,<2.0
-sentence-transformers>=3.0.0
+# sentence-transformers removed — DISABLE_NEURAL_SEARCH=true on Render free tier
+# saves ~1GB of torch/transformers disk/RAM usage
 scikit-learn>=1.4.0
 datasets
 pandas

@@ -9,10 +9,11 @@ google-genai>=1.0.0
 faiss-cpu>=1.8.0
 numpy>=1.26,<2.0
 
-# Sentence embeddings (optional — system falls back to TF-IDF if unavailable)
-sentence-transformers>=3.0.0
+# Sentence embeddings — commented out for Render free-tier deployment (DISABLE_NEURAL_SEARCH=true)
+# Uncomment if running on an instance with >2GB RAM and neural search enabled
+# sentence-transformers>=3.0.0
 
-# TF-IDF fallback (ships with scikit-learn)
+# TF-IDF fallback (ships with scikit-learn, no torch dependency)
 scikit-learn>=1.4.0
 
 # HTTP client for Gemini REST API calls
