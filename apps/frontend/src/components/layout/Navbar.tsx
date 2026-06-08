@@ -1,11 +1,13 @@
 import { NavLink } from 'react-router-dom';
-import { Github } from 'lucide-react';
+import { Github, Maximize2, Minimize2 } from 'lucide-react';
 import { useApiHealth } from '../../hooks/useApiHealth';
+import { useFullscreen } from '../../hooks/useFullscreen';
 
 const GITHUB_URL = 'https://github.com/Inference-ng/pulseagent_ai';
 
 export function Navbar() {
   const { status } = useApiHealth();
+  const { isFullscreen, toggle: toggleFullscreen, isSupported: fsSupported } = useFullscreen();
 
   const statusLabel: Record<string, string> = {
     checking: 'Connecting…',
@@ -68,6 +70,22 @@ export function Navbar() {
             <span className={`h-1.5 w-1.5 rounded-full ${dotColor[status]}`} />
             <span className="hidden sm:inline">{statusLabel[status]}</span>
           </span>
+
+          {/* Fullscreen toggle — mobile only */}
+          {fsSupported && (
+            <button
+              id="fullscreen-toggle-btn"
+              type="button"
+              aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+              aria-pressed={isFullscreen}
+              onClick={toggleFullscreen}
+              className="sm:hidden flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-mist transition-all duration-150 hover:border-white/20 hover:bg-white/10 hover:text-ink active:scale-95"
+            >
+              {isFullscreen
+                ? <Minimize2 className="h-4 w-4" />
+                : <Maximize2 className="h-4 w-4" />}
+            </button>
+          )}
 
           {/* GitHub */}
           <a
