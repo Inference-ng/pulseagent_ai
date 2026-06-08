@@ -3,10 +3,11 @@ import { ScoreBar } from '../ui/ScoreBar';
 import { Badge } from '../ui/Badge';
 import { MessageSquare, Send } from 'lucide-react';
 import { useState } from 'react';
-import type { RecommendationResponse } from '../../types';
+import type { RecommendationResponse, Domain } from '../../types';
 
 interface RecommendationListProps {
   result:       RecommendationResponse;
+  selectedDomain: Domain;
   onFollowUp:   (q: string) => Promise<void>;
   isFollowUpLoading: boolean;
 }
@@ -20,7 +21,7 @@ const categoryColors: Record<string, 'emerald' | 'amber' | 'mist'> = {
   restaurants: 'amber',
 };
 
-export function RecommendationList({ result, onFollowUp, isFollowUpLoading }: RecommendationListProps) {
+export function RecommendationList({ result, selectedDomain, onFollowUp, isFollowUpLoading }: RecommendationListProps) {
   const [followUp, setFollowUp] = useState('');
 
   const handleSend = async () => {
@@ -61,36 +62,44 @@ export function RecommendationList({ result, onFollowUp, isFollowUpLoading }: Re
 
       {/* Recommendation items */}
       <div className="space-y-3">
-        {items.map((item, idx) => (
-          <motion.article
-            key={item.item_id}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.04, duration: 0.3 }}
-            className="card-sm"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3 min-w-0">
-                {/* Rank badge */}
-                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-surface text-xs font-bold text-mist border border-white/[0.08]">
-                  {idx + 1}
-                </span>
-                <div className="min-w-0">
-                  <h4 className="text-sm font-semibold text-ink truncate">{item.item_name}</h4>
-                  <span className={`badge ${categoryColors[item.category] === 'emerald' ? 'badge-emerald' : 'badge-amber'} mt-1 text-[10px] capitalize`}>
-                    {item.category}
+        {items.map((item, idx) => {
+          const isCrossDomain = item.category.toLowerCase() !== selectedDomain.toLowerCase();
+
+          return (
+            <motion.article
+              key={item.item_id}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.04, duration: 0.3 }}
+              className="card-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  {/* Rank badge */}
+                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-surface text-xs font-bold text-mist border border-white/[0.08]">
+                    {idx + 1}
                   </span>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-semibold text-ink truncate">{item.item_name}</h4>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      <span className={`badge ${categoryColors[item.category] === 'emerald' ? 'badge-emerald' : 'badge-amber'} text-[10px] capitalize`}>
+                        {item.category}
+                      </span>
+                      {result.is_cold_start && <Badge tone="amber">[COLD START]</Badge>}
+                      {isCrossDomain && <Badge tone="mist">[CROSS-DOMAIN]</Badge>}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-sm font-bold text-ink">{Math.round(item.score * 100)}%</p>
+                  <p className="text-[10px] text-mist">match</p>
                 </div>
               </div>
-              <div className="flex-shrink-0 text-right">
-                <p className="text-sm font-bold text-ink">{Math.round(item.score * 100)}%</p>
-                <p className="text-[10px] text-mist">match</p>
-              </div>
-            </div>
-            <ScoreBar score={item.score} />
-            <p className="mt-2 text-xs leading-5 text-mist italic">{item.reason}</p>
-          </motion.article>
-        ))}
+              <ScoreBar score={item.score} />
+              <p className="mt-2 text-xs leading-5 text-mist italic">{item.reason}</p>
+            </motion.article>
+          );
+        })}
       </div>
 
       {/* Follow-up conversation */}

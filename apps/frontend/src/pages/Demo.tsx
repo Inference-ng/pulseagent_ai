@@ -175,6 +175,7 @@ export function DemoPage() {
           {!recommendations.isLoading && recommendations.data && (
             <RecommendationList
               result={recommendations.data}
+              selectedDomain={lastBValues.domain}
               onFollowUp={handleFollowUp}
               isFollowUpLoading={followUpLoading}
             />
