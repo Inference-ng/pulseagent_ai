@@ -58,10 +58,16 @@ export function PersonaCard({ persona }: PersonaCardProps) {
           <p className="eyebrow mb-2 flex items-center gap-1">
             <ShoppingBag className="h-3 w-3" />History
           </p>
-          <div className="flex flex-wrap gap-1 sm:gap-1.5 overflow-hidden">
+          <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-28 overflow-y-auto">
             {persona.purchase_history.length > 0
               ? persona.purchase_history.map((item) => (
-                  <span key={item} className="badge-mist truncate max-w-[70px] sm:max-w-[120px] text-[10px] sm:text-xs" title={item}>{item}</span>
+                  <span
+                    key={item}
+                    className="badge-mist text-[10px] sm:text-xs break-words hyphens-auto"
+                    style={{ wordBreak: 'break-word' }}
+                  >
+                    {item}
+                  </span>
                 ))
               : <span className="text-xs text-mist italic">No history — cold start</span>
             }
@@ -73,7 +79,7 @@ export function PersonaCard({ persona }: PersonaCardProps) {
           <p className="eyebrow mb-2 flex items-center gap-1">
             <Tag className="h-3 w-3" />Categories
           </p>
-          <div className="flex flex-wrap gap-1 sm:gap-1.5 overflow-hidden">
+          <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-28 overflow-y-auto">
             {persona.preferred_categories.length > 0
               ? persona.preferred_categories.map((cat) => (
                   <span key={cat} className="badge-emerald capitalize text-[10px] sm:text-xs">{cat}</span>
