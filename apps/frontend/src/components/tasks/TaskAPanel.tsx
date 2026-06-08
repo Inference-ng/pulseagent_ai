@@ -38,20 +38,20 @@ export function TaskAPanel({ persona, onSubmit, isLoading, error, onClearError }
 
   return (
     <section className="card">
-      <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
+      <div className="mb-4 sm:mb-5 flex items-start justify-between gap-2 sm:gap-4">
+        <div className="min-w-0 flex-1">
           <p className="eyebrow mb-1">Task A — User Modeling</p>
-          <h2 className="text-lg font-bold text-ink">Review Simulator</h2>
-          <p className="mt-0.5 text-xs text-mist">
+          <h2 className="text-base sm:text-lg font-bold text-ink">Review Simulator</h2>
+          <p className="mt-0.5 text-xs text-mist truncate">
             Generating as <span className="font-semibold text-emerald">{persona.name ?? persona.user_id}</span>
           </p>
         </div>
-        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald/10 border border-emerald/20">
+        <span className="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald/10 border border-emerald/20">
           <WandSparkles className="h-4 w-4 text-emerald" />
         </span>
       </div>
 
-      <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
+      <form className="grid gap-3 sm:gap-4 sm:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
         <label className="field-label sm:col-span-2">
           Product name *
           <input

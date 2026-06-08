@@ -51,7 +51,7 @@ export function HomePage() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-panel p-7 sm:p-10"
+        className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-panel p-5 sm:p-7 lg:p-10"
       >
         {/* Background glows */}
         <div className="pointer-events-none absolute inset-0 bg-hero-glow opacity-60" />
@@ -69,16 +69,16 @@ export function HomePage() {
             )}
           </div>
 
-          <h1 className="text-4xl font-extrabold leading-tight text-ink sm:text-5xl lg:text-6xl">
+          <h1 className="text-2xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl lg:text-6xl">
             Meet{' '}
             <span className="bg-gradient-to-r from-emerald to-gold bg-clip-text text-transparent">
               PulseAgent AI
             </span>
           </h1>
-          <p className="mt-2 text-lg font-medium text-mist sm:text-xl">
+          <p className="mt-2 text-base font-medium text-mist sm:text-lg md:text-xl">
             The agent that knows your customers.
           </p>
-          <p className="mt-5 max-w-2xl text-sm leading-7 text-mist sm:text-base">
+          <p className="mt-4 sm:mt-5 max-w-2xl text-xs leading-6 text-mist sm:text-sm sm:leading-7">
             A dual-task LLM system for <strong className="text-ink">user modeling</strong> and{' '}
             <strong className="text-ink">personalized recommendation</strong> — built on LangGraph,
             FAISS, and Gemini, contextualized for Nigerian e-commerce.
@@ -106,7 +106,7 @@ export function HomePage() {
             transition={{ delay: 0.1 + i * 0.08 }}
             className="card text-center"
           >
-            <p className="text-4xl font-extrabold text-emerald">{s.value}</p>
+            <p className="text-3xl sm:text-4xl font-extrabold text-emerald">{s.value}</p>
             <p className="mt-2 text-sm font-semibold text-ink">{s.label}</p>
             <p className="mt-1 text-xs text-mist">{s.sub}</p>
           </motion.div>
@@ -116,7 +116,7 @@ export function HomePage() {
       {/* ── Features ── */}
       <section>
         <p className="eyebrow mb-4">What it does</p>
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => {
             const Icon = f.icon;
             return (
@@ -131,7 +131,7 @@ export function HomePage() {
                   <Icon className={`h-5 w-5 ${f.color}`} />
                 </span>
                 <h2 className="text-base font-bold text-ink">{f.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-mist">{f.description}</p>
+                <p className="mt-2 text-xs sm:text-sm leading-5 sm:leading-6 text-mist">{f.description}</p>
               </motion.article>
             );
           })}
@@ -144,7 +144,7 @@ export function HomePage() {
           <Globe className="h-3 w-3" />System architecture
         </p>
         <h2 className="mb-5 text-xl font-bold text-ink">How PulseAgent works</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { step: '01', title: 'Data layer',   desc: 'Amazon Reviews 2023 + Yelp + Goodreads → embedded via Sentence-BERT into FAISS index.',          icon: Database },
             { step: '02', title: 'AI agents',    desc: 'Two LangGraph state machines (Task A + B) with retrieve → contextualize → generate → validate.',   icon: BrainCircuit },

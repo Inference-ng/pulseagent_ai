@@ -63,10 +63,10 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex flex-shrink-0 items-center gap-2 sm:gap-3">
-          {/* API status */}
-          <span className={`hidden items-center gap-1.5 text-xs font-medium sm:flex ${statusColor[status]}`}>
+          {/* API status — dot only on mobile, full label on sm+ */}
+          <span className={`flex items-center gap-1.5 text-xs font-medium ${statusColor[status]}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${dotColor[status]}`} />
-            {statusLabel[status]}
+            <span className="hidden sm:inline">{statusLabel[status]}</span>
           </span>
 
           {/* GitHub */}

@@ -115,7 +115,7 @@ export function DemoPage() {
   };
 
   return (
-    <div className="space-y-6 py-6 sm:py-8">
+    <div className="space-y-4 sm:space-y-6 py-4 sm:py-6 lg:py-8">
 
       {/* ── Persona strip ── */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
@@ -140,7 +140,7 @@ export function DemoPage() {
       <div className="divider" />
 
       {/* ── Task panels ── */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
 
         {/* Task A column */}
         <div className="space-y-5">
