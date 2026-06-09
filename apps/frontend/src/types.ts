@@ -40,6 +40,7 @@ export interface RecommendationItem {
   category: string;
   score: number;
   reason: string;
+  price: number;
 }
 
 export interface RecommendationRequest {

@@ -19,6 +19,7 @@ class RecommendationItem(BaseModel):
     category: str
     score: float = Field(..., description="Relevance score (0-1)")
     reason: str = Field(..., description="Why this item is recommended")
+    price: int = Field(0, description="Product price in Naira")
 
 
 class RecommendResponse(BaseModel):

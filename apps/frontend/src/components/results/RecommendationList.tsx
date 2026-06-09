@@ -77,9 +77,16 @@ export function RecommendationList({ result, onFollowUp, isFollowUpLoading }: Re
                 </span>
                 <div className="min-w-0 flex-1 overflow-hidden">
                   <h4 className="text-xs sm:text-sm font-semibold text-ink truncate">{item.item_name}</h4>
-                  <span className={`badge ${categoryColors[item.category] === 'emerald' ? 'badge-emerald' : 'badge-amber'} mt-1 text-[10px] capitalize`}>
-                    {item.category}
-                  </span>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className={`badge ${categoryColors[item.category] === 'emerald' ? 'badge-emerald' : 'badge-amber'} text-[10px] capitalize`}>
+                      {item.category}
+                    </span>
+                    {item.price > 0 && (
+                      <span className="text-[10px] font-semibold text-emerald-400">
+                        ₦{item.price.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex-shrink-0 text-right">
