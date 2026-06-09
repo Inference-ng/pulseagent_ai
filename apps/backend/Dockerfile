@@ -19,7 +19,7 @@ RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTr
 # ── Application code ──────────────────────────────────────────────────────────
 COPY apps/backend/ .
 COPY apps/ai-agent/ /ai-agent
-# NOTE: data/processed/ is NOT copied — artifacts are pulled from S3 at startup
+COPY data/processed/ /app/data/processed/
 
 RUN prisma generate
 
