@@ -9,6 +9,28 @@ from app.services.agent_service import run_task_b
 from app.services.db_service import log_recommendation, log_audit
 from app.utils.constants import AGENT_TIMEOUT, VALID_DOMAINS
 
+@router.get("/test-task-b")
+async def test_task_b():
+    import traceback
+    try:
+        from agents.recommendation_agent import retrieve, cold_start_check, rank, cross_domain
+        from memory.faiss_store import FAISSStore
+        
+        state = {
+            "user_persona": {"user_id": "test", "age_group": "25-34", "price_sensitivity": "medium", "preferred_categories": ["fashion"], "purchase_history": []},
+            "top_k": 5,
+            "domain": "fashion", 
+            "context_query": "Yoruba attire",
+            "candidate_products": [],
+            "final_result": {},
+            "errors": []
+        }
+        
+        state = retrieve(state)
+        return {"step": "retrieve_ok", "candidates": len(state["candidate_products"]), "sample": state["candidate_products"][:2]}
+    except Exception as e:
+        return {"error": str(e), "traceback": traceback.format_exc()}
+
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
 
 
