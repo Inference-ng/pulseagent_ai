@@ -62,3 +62,7 @@ prompt.md
 
 assessment.md
 
+
+data/processed/tfidf_model.pkl
+
+data/processed/items_metadata_original.pkl

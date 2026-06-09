@@ -1,28 +1,37 @@
-# Core agent framework
+# ── Core agent framework ──────────────────────────────────────────────────────
 langgraph>=0.2.0,<0.3.0
 langchain-core>=0.2.0,<0.4.0
 
-# Gemini — use the native SDK directly (avoids region restriction issues in langchain-google-genai)
+# ── LLM providers ─────────────────────────────────────────────────────────────
+# Gemini — native SDK, avoids region restriction in langchain-google-genai
 google-genai>=1.0.0
 
-# Vector search
+# ── Vector search ─────────────────────────────────────────────────────────────
 faiss-cpu>=1.8.0
 numpy>=1.26,<2.0
 
-# Sentence embeddings — commented out for Render free-tier deployment (DISABLE_NEURAL_SEARCH=true)
-# Uncomment if running on an instance with >2GB RAM and neural search enabled
-# sentence-transformers>=3.0.0
+# ── Sentence embeddings (neural search) ──────────────────────────────────────
+# Enabled for AWS deployment — ECS task definition should have >= 2 GB memory.
+# To disable neural search (e.g. t3.small / < 1 GB RAM): set DISABLE_NEURAL_SEARCH=1
+sentence-transformers>=3.0.0
 
-# TF-IDF fallback (ships with scikit-learn, no torch dependency)
+# ── TF-IDF fallback (no torch dependency) ─────────────────────────────────────
 scikit-learn>=1.4.0
 
-# HTTP client for Gemini REST API calls
+# ── AWS SDK ───────────────────────────────────────────────────────────────────
+# Used to download FAISS artifacts from S3 at container startup
+boto3>=1.34.0
+
+# ── HTTP client for Gemini / Groq / OpenRouter REST calls ────────────────────
 httpx>=0.27.0
 
-# Data + utils
+# ── Data + utils ──────────────────────────────────────────────────────────────
 pandas>=2.0
 python-dotenv
 pydantic>=2.0
 
-# Testing
+# ── Dataset loading (build_index.py only) ────────────────────────────────────
+datasets
+
+# ── Testing ───────────────────────────────────────────────────────────────────
 pytest
