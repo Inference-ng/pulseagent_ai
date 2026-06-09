@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { ScoreBar } from '../ui/ScoreBar';
 import { Badge } from '../ui/Badge';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send, Tag } from 'lucide-react';
 import { useState } from 'react';
 import type { RecommendationResponse } from '../../types';
 
 interface RecommendationListProps {
-  result:       RecommendationResponse;
-  onFollowUp:   (q: string) => Promise<void>;
+  result:            RecommendationResponse;
+  onFollowUp:        (q: string) => Promise<void>;
   isFollowUpLoading: boolean;
 }
 
@@ -19,6 +19,11 @@ const categoryColors: Record<string, 'emerald' | 'amber' | 'mist'> = {
   beauty:      'emerald',
   restaurants: 'amber',
 };
+
+function formatNGN(price?: number): string | null {
+  if (!price || price <= 0) return null;
+  return '₦' + price.toLocaleString('en-NG');
+}
 
 export function RecommendationList({ result, onFollowUp, isFollowUpLoading }: RecommendationListProps) {
   const [followUp, setFollowUp] = useState('');
@@ -61,43 +66,70 @@ export function RecommendationList({ result, onFollowUp, isFollowUpLoading }: Re
 
       {/* Recommendation items */}
       <div className="space-y-2 sm:space-y-3">
-        {items.map((item, idx) => (
-          <motion.article
-            key={item.item_id}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.04, duration: 0.3 }}
-            className="card-sm overflow-hidden"
-          >
-            <div className="flex items-start justify-between gap-2 sm:gap-3">
-              <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
-                {/* Rank badge */}
-                <span className="flex h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0 items-center justify-center rounded-lg bg-surface text-[10px] sm:text-xs font-bold text-mist border border-white/[0.08]">
-                  {idx + 1}
-                </span>
-                <div className="min-w-0 flex-1 overflow-hidden">
-                  <h4 className="text-xs sm:text-sm font-semibold text-ink truncate">{item.item_name}</h4>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className={`badge ${categoryColors[item.category] === 'emerald' ? 'badge-emerald' : 'badge-amber'} text-[10px] capitalize`}>
-                      {item.category}
-                    </span>
-                    {item.price > 0 && (
-                      <span className="text-[10px] font-semibold text-emerald-400">
-                        ₦{item.price.toLocaleString()}
+        {items.map((item, idx) => {
+          const priceLabel  = formatNGN(item.price);
+          const catKey      = item.category.toLowerCase() as keyof typeof categoryColors;
+          const colorTone   = categoryColors[catKey] ?? 'mist';
+
+          return (
+            <motion.article
+              key={item.item_id}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.04, duration: 0.3 }}
+              className="card-sm overflow-hidden"
+            >
+              <div className="flex items-start justify-between gap-2 sm:gap-3">
+                <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                  {/* Rank badge */}
+                  <span className="flex h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0 items-center justify-center rounded-lg bg-surface text-[10px] sm:text-xs font-bold text-mist border border-white/[0.08]">
+                    {idx + 1}
+                  </span>
+
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    {/* Name */}
+                    <h4 className="text-xs sm:text-sm font-semibold text-ink truncate">
+                      {item.item_name}
+                    </h4>
+
+                    {/* Category + Brand row */}
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                      <span className={`badge ${colorTone === 'emerald' ? 'badge-emerald' : colorTone === 'amber' ? 'badge-amber' : 'badge-mist'} text-[10px] capitalize`}>
+                        {item.category}
                       </span>
+                      {item.brand && (
+                        <span className="text-[10px] text-mist/70 truncate max-w-[120px]">
+                          {item.brand}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Price tag */}
+                    {priceLabel && (
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <Tag className="h-3 w-3 text-emerald-400 flex-shrink-0" />
+                        <span className="text-xs font-bold text-emerald-400">
+                          {priceLabel}
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
+
+                {/* Score */}
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-xs sm:text-sm font-bold text-ink">{Math.round(item.score * 100)}%</p>
+                  <p className="text-[10px] text-mist">match</p>
+                </div>
               </div>
-              <div className="flex-shrink-0 text-right">
-                <p className="text-xs sm:text-sm font-bold text-ink">{Math.round(item.score * 100)}%</p>
-                <p className="text-[10px] text-mist">match</p>
-              </div>
-            </div>
-            <ScoreBar score={item.score} />
-            <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-5 text-mist italic break-words">{item.reason}</p>
-          </motion.article>
-        ))}
+
+              <ScoreBar score={item.score} />
+              <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-5 text-mist italic break-words">
+                {item.reason}
+              </p>
+            </motion.article>
+          );
+        })}
       </div>
 
       {/* Follow-up conversation */}
