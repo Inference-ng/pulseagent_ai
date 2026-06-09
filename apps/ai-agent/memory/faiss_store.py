@@ -90,7 +90,7 @@ class FAISSStore:
         base_dir = Path(
             os.environ.get(
                 "FAISS_DATA_DIR",
-                str(Path(__file__).resolve().parents[3] / "data" / "processed"),
+                os.environ.get("FAISS_DATA_DIR", str(Path(__file__).resolve().parents[2] / "data" / "processed")),
             )
         )
 
