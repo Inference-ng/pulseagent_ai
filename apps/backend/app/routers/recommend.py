@@ -9,29 +9,29 @@ from app.services.agent_service import run_task_b
 from app.services.db_service import log_recommendation, log_audit
 from app.utils.constants import AGENT_TIMEOUT, VALID_DOMAINS
 
+router = APIRouter(prefix="/api/v1", tags=["tasks"])
+
+
 @router.get("/test-task-b")
 async def test_task_b():
     import traceback
     try:
         from agents.recommendation_agent import retrieve, cold_start_check, rank, cross_domain
-        from memory.faiss_store import FAISSStore
-        
+
         state = {
             "user_persona": {"user_id": "test", "age_group": "25-34", "price_sensitivity": "medium", "preferred_categories": ["fashion"], "purchase_history": []},
             "top_k": 5,
-            "domain": "fashion", 
+            "domain": "fashion",
             "context_query": "Yoruba attire",
             "candidate_products": [],
             "final_result": {},
             "errors": []
         }
-        
+
         state = retrieve(state)
         return {"step": "retrieve_ok", "candidates": len(state["candidate_products"]), "sample": state["candidate_products"][:2]}
     except Exception as e:
         return {"error": str(e), "traceback": traceback.format_exc()}
-
-router = APIRouter(prefix="/api/v1", tags=["tasks"])
 
 
 @router.post("/recommend", response_model=RecommendResponse)
@@ -39,28 +39,11 @@ async def recommend(
     req: RecommendRequest,
     background_tasks: BackgroundTasks,
 ):
-    """
-    POST /api/v1/recommend
-    
-    Task B: Get personalized product recommendations for a user.
-    Handles cold-start users and cross-domain recommendations.
-    
-    Args:
-        req: RecommendRequest with user_persona, top_k, domain
-        background_tasks: FastAPI background tasks for logging
-        
-    Returns:
-        RecommendResponse with ranked list of recommendations
-        
-    Raises:
-        HTTPException: If domain invalid, agent fails, or times out
-    """
     start_time = time.time()
     status_code = 200
     error_msg = None
-    
+
     try:
-        # Validate domain
         if req.domain not in VALID_DOMAINS:
             status_code = 422
             error_msg = f"Invalid domain: {req.domain}"
@@ -68,8 +51,7 @@ async def recommend(
                 status_code=422,
                 detail=f"Domain must be one of: {', '.join(VALID_DOMAINS)}",
             )
-        
-        # Call agent with timeout
+
         try:
             result = await asyncio.wait_for(
                 run_task_b(req.user_persona.model_dump(), req.top_k, req.domain, req.context_query),
@@ -78,35 +60,19 @@ async def recommend(
         except asyncio.TimeoutError:
             status_code = 504
             error_msg = "Agent execution timeout"
-            raise HTTPException(
-                status_code=504,
-                detail="Agent took too long to respond (timeout)",
-            )
+            raise HTTPException(status_code=504, detail="Agent took too long to respond (timeout)")
         except Exception as e:
             status_code = 500
             error_msg = str(e)
-            raise HTTPException(
-                status_code=500,
-                detail=f"Agent error: {str(e)}",
-            )
-        
-        # Validate response structure
-        if not all(key in result for key in [
-            "recommendations",
-            "is_cold_start",
-            "total",
-        ]):
+            raise HTTPException(status_code=500, detail=f"Agent error: {str(e)}")
+
+        if not all(key in result for key in ["recommendations", "is_cold_start", "total"]):
             status_code = 500
             error_msg = "Invalid agent response structure"
-            raise HTTPException(
-                status_code=500,
-                detail="Agent returned invalid response structure",
-            )
-        
-        # Build response
+            raise HTTPException(status_code=500, detail="Agent returned invalid response structure")
+
         response = RecommendResponse(**result)
-        
-        # Log to database in background
+
         background_tasks.add_task(
             log_recommendation,
             req.user_persona.user_id,
@@ -114,22 +80,18 @@ async def recommend(
             req.domain,
             result.get("is_cold_start", False),
         )
-        
+
         return response
-        
+
     except HTTPException:
         raise
     except Exception as e:
         status_code = 500
         error_msg = str(e)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Unexpected error: {str(e)}",
-        )
-    
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
     finally:
-        # Log audit in background
-        duration = int((time.time() - start_time) * 1000)  # ms
+        duration = int((time.time() - start_time) * 1000)
         background_tasks.add_task(
             log_audit,
             "/api/v1/recommend",
