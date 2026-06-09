@@ -365,6 +365,7 @@ def get_recommendations(
     domain: str = "fashion",
     context_query: str = "",
 ) -> dict:
+    import traceback
     initial_state: RecoAgentState = {
         "user_persona":       user_persona,
         "top_k":              top_k,
@@ -376,16 +377,16 @@ def get_recommendations(
     }
     try:
         final_state = app.invoke(initial_state)
-        result = final_state.get("final_result", {})
-        if not result or "recommendations" not in result:
-            raise ValueError("Empty result from graph")
-        return result
+        return final_state["final_result"]
     except Exception as e:
-        logger.error("[TaskB] Graph execution failed: %s", e)
-        # Direct fallback — bypass LangGraph entirely
-        from agents.recommendation_agent import cold_start_check, rank
-        state = cold_start_check(initial_state)
-        state = rank(state)
-        return state.get("final_result", {
-            "recommendations": [], "is_cold_start": True, "total": 0
-        })
+        logger.error("[TaskB] Graph crashed: %s\nTraceback: %s", e, traceback.format_exc())
+        # Bypass LangGraph — run nodes directly
+        try:
+            state = retrieve(initial_state)
+            state = cold_start_check(state)
+            state = rank(state)
+            state = cross_domain(state)
+            return state.get("final_result", {"recommendations": [], "is_cold_start": True, "total": 0})
+        except Exception as e2:
+            logger.error("[TaskB] Direct fallback also failed: %s\nTraceback: %s", e2, traceback.format_exc())
+            return {"recommendations": [], "is_cold_start": True, "total": 0}
