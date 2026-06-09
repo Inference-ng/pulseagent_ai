@@ -43,7 +43,7 @@ class RecoAgentState(TypedDict):
     context_query: str
     candidate_products: list
     final_result: dict
-    errors: list
+    errors: list[str]
 
 
 # ── Retrieve ──────────────────────────────────────────────────────────────────
@@ -366,13 +366,26 @@ def get_recommendations(
     context_query: str = "",
 ) -> dict:
     initial_state: RecoAgentState = {
-        "user_persona":      user_persona,
-        "top_k":             top_k,
-        "domain":            domain,
-        "context_query":     context_query,
+        "user_persona":       user_persona,
+        "top_k":              top_k,
+        "domain":             domain,
+        "context_query":      context_query,
         "candidate_products": [],
-        "final_result":      {},
-        "errors":            [],
+        "final_result":       {},
+        "errors":             [],
     }
-    final_state = app.invoke(initial_state)
-    return final_state["final_result"]
+    try:
+        final_state = app.invoke(initial_state)
+        result = final_state.get("final_result", {})
+        if not result or "recommendations" not in result:
+            raise ValueError("Empty result from graph")
+        return result
+    except Exception as e:
+        logger.error("[TaskB] Graph execution failed: %s", e)
+        # Direct fallback — bypass LangGraph entirely
+        from agents.recommendation_agent import cold_start_check, rank
+        state = cold_start_check(initial_state)
+        state = rank(state)
+        return state.get("final_result", {
+            "recommendations": [], "is_cold_start": True, "total": 0
+        })

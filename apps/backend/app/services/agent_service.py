@@ -58,31 +58,21 @@ async def run_task_a(user_persona: Dict, product: Dict) -> Dict[str, Any]:
 async def run_task_b(
     user_persona: Dict, top_k: int, domain: str, context_query: str = ""
 ) -> Dict[str, Any]:
-    """
-    Task B: Get personalized product recommendations.
-    Wraps Emmanuel's synchronous agent to run in a thread (async-safe).
-
-    Args:
-        user_persona: User profile with user_id, purchase_history, price_sensitivity, etc.
-        top_k: Number of recommendations (1-50)
-        domain: Product domain (fashion, electronics, books, food)
-
-    Returns:
-        dict with keys:
-            - recommendations (list of dicts with item_id, item_name, category, score, reason)
-            - is_cold_start (bool, True if user has no history)
-            - total (int, number of recommendations returned)
-
-    Raises:
-        Exception: If agent fails or module not found
-    """
     try:
         from agents.recommendation_agent import get_recommendations  # type: ignore[import]
 
-        # Run sync agent in a separate thread to avoid blocking the async loop
         result = await asyncio.to_thread(
             get_recommendations, user_persona, top_k, domain, context_query
         )
+        
+        # Ensure result has required keys
+        if not result or "recommendations" not in result:
+            return {
+                "recommendations": [],
+                "is_cold_start": True,
+                "total": 0
+            }
+        
         return result
 
     except ImportError as e:
