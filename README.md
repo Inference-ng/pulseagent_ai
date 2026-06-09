@@ -4,7 +4,6 @@
 > A dual-task LLM system for user modeling and personalized recommendation — built for the Bluechip Tech Hackathon 2026.
 
 
-
 ---
 
 
